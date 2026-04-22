@@ -1,33 +1,86 @@
+'use client';
+
+import SectionContainer from '@/components/ui/SectionContainer';
+import SectionHeader from '@/components/ui/SectionHeader';
+import ArrowIcon from '@/components/ui/ArrowIcon';
+
 const PROJECTS = [
-  { id: 1, title: 'Фигня 1', link: '#' },
-  { id: 2, title: 'Фигня 2', link: '#' },
-  { id: 3, title: 'Фигня 3', link: '#' },
-];
+  {
+    id: '01',
+    title: 'Заглушка 1',
+    desc: 'Заглушка',
+    link: '#',
+    tech: 'Заглушка',
+  },
+  {
+    id: '02',
+    title: 'Заглушка 2',
+    desc: 'Заглушка',
+    link: '#',
+    tech: 'Заглушка',
+  },
+  {
+    id: '03',
+    title: 'Заглушка 3',
+    desc: 'Заглушка',
+    link: '#',
+    tech: 'Заглушка',
+  },
+] as const;
 
 export default function Projects() {
   return (
-    <section
-      id="projects"
-      className="min-h-screen py-20 px-4 bg-black text-white"
-    >
-      <h2 className="text-center text-3xl font-bold mb-12">Мои проекты</h2>
+    <SectionContainer id="projects">
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="relative z-10 mx-auto w-full max-w-6xl">
+          <SectionHeader index="02" label="Проекты" />
+        </div>
 
-      <div className="grid gap-6 max-w-5xl mx-auto sm:grid-cols-2 lg:grid-cols-3">
-        {PROJECTS.map((p) => (
-          <div
-            key={p.id}
-            className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition-all"
-          >
-            <h3 className="text-xl font-semibold mb-4">{p.title}</h3>
+        <h2 className="mb-20 text-4xl font-semibold tracking-tighter sm:text-5xl">
+          Проекты <span className="font-light italic text-blue-500">&</span>{' '}
+          Кейсы
+        </h2>
+
+        <div className="flex flex-col border-t border-white/10">
+          {PROJECTS.map((p) => (
             <a
+              key={p.id}
               href={p.link}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="group flex flex-col justify-between border-b border-white/10 py-10 transition-all hover:px-2 md:flex-row md:items-center"
             >
-              Посмотреть →
+              <div className="flex items-start gap-8">
+                <span className="mt-2 font-mono text-[10px] uppercase tracking-widest text-gray-500">
+                  [{p.id}]
+                </span>
+
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-medium tracking-tight transition-colors duration-300 group-hover:text-blue-500">
+                    {p.title}
+                  </h3>
+                  <p className="max-w-sm text-sm font-light leading-relaxed text-gray-500 transition-colors group-hover:text-gray-400">
+                    {p.desc}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex items-center gap-12 md:mt-0">
+                <div className="flex flex-col items-start font-mono md:items-end">
+                  <span className="mb-1 text-[9px] uppercase tracking-[0.2em] text-gray-600">
+                    Stack
+                  </span>
+                  <span className="text-xs text-gray-400 transition-colors group-hover:text-white">
+                    {p.tech}
+                  </span>
+                </div>
+
+                <div className="translate-x-4 text-blue-500 opacity-20 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+                  <ArrowIcon />
+                </div>
+              </div>
             </a>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </section>
+    </SectionContainer>
   );
 }

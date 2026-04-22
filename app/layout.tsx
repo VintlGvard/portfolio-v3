@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import type { ReactNode } from 'react';
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic'],
@@ -13,15 +14,15 @@ export const metadata: Metadata = {
   description: 'Web Developer Portfolio',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="ru" className="scroll-smooth">
       <body className={inter.className}>
-        <main style={{ paddingBottom: '60px' }}>{children}</main>
+        <main className="pb-[60px]">{children}</main>
         <Navbar />
       </body>
     </html>

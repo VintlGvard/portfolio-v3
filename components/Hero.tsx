@@ -1,25 +1,95 @@
-export default function Hero(): React.JSX.Element {
+'use client';
+
+import { useEffect, useState } from 'react';
+
+const words = ['MVP', 'АРХИТЕКТУРУ', 'ПРОТОТИПЫ', 'РЕШЕНИЯ'] as const;
+
+export default function Hero() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % words.length);
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const getRandomShift = (i: number): string => {
+    if (i !== index) return 'translate-x-0';
+    const shifts = [
+      'translate-x-2',
+      '-translate-x-2',
+      'translate-x-0',
+    ] as const;
+    return shifts[i % shifts.length];
+  };
+
   return (
     <section
       id="hero"
-      className="flex h-screen flex-col items-center justify-center bg-black px-4 text-center text-white"
+      className="relative flex min-h-screen flex-col overflow-hidden bg-[#050505] p-6 pt-[15vh] text-white"
     >
-      <h2 className="text-xl font-medium text-gray-400 sm:text-2xl">
-        Привет, я Виталий!
-      </h2>
+      <div className="pointer-events-none absolute inset-0 flex select-none items-center justify-center opacity-[0.015]">
+        <h2 className="text-[45vw] font-black uppercase tracking-tighter animate-pulse">
+          DEV
+        </h2>
+      </div>
 
-      <h1 className="my-4 text-4xl font-bold tracking-tight sm:text-6xl">
-        Full Stack Developer
-      </h1>
+      <div className="relative z-10 mx-auto w-full max-w-[1600px]">
+        <div className="flex flex-col items-start">
+          <h2 className="mb-4 font-mono text-xs uppercase tracking-[0.4em] text-blue-600 sm:text-sm">
+            Смирнов Виталий | VintlGvard
+          </h2>
 
-      <div className="max-w-xl space-y-2 text-gray-400 sm:text-lg">
-        <p>
-          Обеспечиваю полный цикл разработки: от интерфейсов (Frontend) до
-          архитектуры сервера (Backend)
-        </p>
-        <p>
-          Специализируюсь на масштабируемых и высоконагруженных веб-системах
-        </p>
+          <h1 className="text-[13vw] font-black leading-[0.8] tracking-tighter uppercase italic sm:text-[11vw]">
+            Я <span className="text-gray-800 not-italic">собираю</span> <br />
+            <div className="relative inline-flex h-[1.1em] w-full overflow-hidden text-white not-italic">
+              {words.map((word, i) => {
+                const isActive = i === index;
+
+                return (
+                  <span
+                    key={word}
+                    className={`absolute left-0 transition-all duration-[600ms] cubic-bezier(0.23, 1, 0.32, 1) ${
+                      isActive
+                        ? `translate-y-0 opacity-100 ${getRandomShift(i)} blur-0`
+                        : i < index
+                          ? '-translate-y-full rotate-2 opacity-0 blur-md'
+                          : 'translate-y-full -rotate-2 opacity-0 blur-md'
+                    }`}
+                  >
+                    <span
+                      className={
+                        isActive
+                          ? 'bg-gradient-to-r from-white via-white to-blue-900 bg-clip-text'
+                          : ''
+                      }
+                    >
+                      {word}
+                    </span>
+                  </span>
+                );
+              })}
+              <span className="opacity-0 tracking-tighter">АРХИТЕКТУРУ</span>
+            </div>
+          </h1>
+
+          <h1 className="mt-2 self-end text-[13vw] font-black leading-[0.8] tracking-tighter uppercase sm:text-[11vw]">
+            С <span className="text-blue-600">НУЛЯ</span>
+          </h1>
+        </div>
+
+        <div className="mt-20 max-w-xl border-l border-blue-600/30 pl-6">
+          <p className="text-lg font-light leading-relaxed text-gray-400 sm:text-xl">
+            Фуллстек разработчик полного цикла <br />
+            <span className="text-white">От идеи до деплоя</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute right-12 top-0 h-full w-[1px] overflow-hidden bg-white/5">
+        <div className="h-20 w-full bg-blue-600 shadow-[0_0_15px_#3b82f6] animate-scan" />
       </div>
     </section>
   );
