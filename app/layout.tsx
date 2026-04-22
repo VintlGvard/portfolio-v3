@@ -10,8 +10,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'My Portfolio',
-  description: 'Web Developer Portfolio',
+  title: 'VintlGvard — Смирнов Виталий, Full‑Stack разработчик',
+  description:
+    'Портфолио VintlGvard (Смирнов Виталий) — Full‑Stack разработчик. Проектирую архитектуру, собираю MVP, прототипы и продакшен‑решения на Next.js, React, Node.js, Python и современном стеке.',
 };
 
 interface RootLayoutProps {
