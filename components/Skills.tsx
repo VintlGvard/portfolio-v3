@@ -83,14 +83,43 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
   return <Cloud {...cloudProps}>{icons}</Cloud>;
 });
 
+const MobileIconGrid = memo(function MobileIconGrid({
+  data,
+}: {
+  data: IconData;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-4 p-4">
+      {Object.values(data.simpleIcons).map((icon) => (
+        <Image
+          key={icon.slug}
+          height={32}
+          width={32}
+          src={`https://cdn.simpleicons.org/${icon.slug}/3b82f6`}
+          alt={icon.title}
+          unoptimized
+        />
+      ))}
+    </div>
+  );
+});
+
 export default function Skills() {
   const [data, setData] = useState<IconData | null>(null);
   const [error, setError] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     fetchSimpleIcons({ slugs: SLUGS })
       .then((res) => setData(res as IconData))
       .catch(() => setError(true));
+  }, []);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
   return (
@@ -112,9 +141,13 @@ export default function Skills() {
             <div className="absolute bottom-0 left-0 z-20 h-2 w-2 border-b border-l border-white/20" />
             <div className="absolute bottom-0 right-0 z-20 h-2 w-2 border-b border-r border-blue-500" />
 
-            <div className="relative z-0 flex h-full w-full max-w-[min(440px,100%)] items-center justify-center">
+            <div className="relative z-0 flex h-full w-full items-center justify-center">
               {data ? (
-                <StaticCloud data={data} />
+                isMobile ? (
+                  <MobileIconGrid data={data} />
+                ) : (
+                  <StaticCloud data={data} />
+                )
               ) : error ? (
                 <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-30">
                   Ошибка загрузки

@@ -37,7 +37,7 @@ export default function Navbar() {
 
   return (
     <div className="pointer-events-none fixed bottom-4 left-0 z-[100] flex w-full justify-center px-2 font-sans sm:bottom-10 sm:px-4">
-      <nav className="pointer-events-auto relative flex items-center gap-0.5 rounded-full border border-white/10 bg-[#050505]/60 p-1 shadow-2xl backdrop-blur-2xl transition-all duration-500 hover:border-white/20 sm:gap-1 sm:p-1.5">
+      <nav className="pointer-events-auto relative flex items-center gap-1 rounded-full border border-white/10 bg-[#050505]/60 p-1.5 shadow-2xl backdrop-blur-2xl transition-all duration-500 hover:border-white/20 sm:gap-1 sm:p-1.5">
         <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
         {NAV_ITEMS.map((item) => {
@@ -49,11 +49,11 @@ export default function Navbar() {
               key={item.href}
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
-              className={`group relative rounded-full px-2.5 py-2 transition-all duration-500 sm:px-5 sm:py-2.5 ${
+              className={`group relative rounded-full px-3 py-2 transition-all duration-500 sm:px-5 sm:py-2.5 ${
                 isActive ? 'text-white' : 'text-gray-500 hover:text-gray-300'
               }`}
             >
-              <span className="relative z-10 font-mono text-[8px] font-medium uppercase tracking-[0.15em] sm:text-[10px] sm:tracking-[0.2em]">
+              <span className="relative z-10 font-mono text-[9px] font-medium uppercase tracking-[0.18em] sm:text-[10px] sm:tracking-[0.2em]">
                 {item.label}
               </span>
 

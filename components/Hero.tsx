@@ -37,8 +37,8 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-[1600px]">
-        <div className="flex flex-col items-start">
-          <h2 className="mb-4 font-mono text-xs uppercase tracking-[0.4em] text-blue-600 sm:text-sm">
+        <div className="flex flex-col items-center sm:items-start">
+          <h2 className="mb-4 text-center font-mono text-xs uppercase tracking-[0.4em] text-blue-600 sm:text-left sm:text-sm">
             Смирнов Виталий | VintlGvard
           </h2>
 
@@ -77,12 +77,12 @@ export default function Hero() {
             </span>
           </h1>
 
-          <h1 className="mt-2 self-end text-[13vw] font-black leading-[0.8] tracking-tighter uppercase sm:text-[11vw]">
+          <h1 className="mt-2 self-center sm:self-end text-[13vw] font-black leading-[0.8] tracking-tighter uppercase sm:text-[11vw]">
             С <span className="text-blue-600">НУЛЯ</span>
           </h1>
         </div>
 
-        <div className="mt-20 max-w-xl border-l border-blue-600/30 pl-6">
+        <div className="mt-20 max-w-xl text-center sm:border-l sm:border-blue-600/30 sm:pl-6 sm:text-left">
           <p className="text-lg font-light leading-relaxed text-gray-400 sm:text-xl">
             Фуллстек разработчик полного цикла <br />
             <span className="text-white">От идеи до деплоя</span>
@@ -90,7 +90,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute right-4 top-0 h-full w-[1px] overflow-hidden bg-white/5 sm:right-12">
+      <div className="pointer-events-none absolute right-4 top-0 hidden h-full w-[1px] overflow-hidden bg-white/5 sm:right-12 sm:block">
         <div className="h-20 w-full bg-blue-600 shadow-[0_0_15px_#3b82f6] animate-scan" />
       </div>
     </section>
