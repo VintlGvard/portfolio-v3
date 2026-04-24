@@ -1,7 +1,6 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import Image from 'next/image';
 import { Cloud, fetchSimpleIcons, type ICloud } from 'react-icon-cloud';
 import SectionContainer from '@/components/ui/SectionContainer';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -39,7 +38,6 @@ const SLUGS = [
   'vite',
   'webpack',
   'jest',
-  'visualstudiocode',
   'intellijidea',
   'pycharm',
   'webstorm',
@@ -55,6 +53,12 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
     containerProps: {
       className: 'flex items-center justify-center w-full h-full',
     },
+    canvasProps: {
+      style: {
+        width: '100%',
+        maxWidth: '100%',
+      },
+    },
     options: {
       reverse: true,
       depth: 0.8,
@@ -65,17 +69,22 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
       outlineColour: '#0000',
       maxSpeed: 0.02,
       minSpeed: 0.01,
+      dragControl: true,
+      dragThreshold: 4,
+      pinchZoom: true,
+      freezeActive: true,
+      shuffleTags: true,
     },
   };
 
   const icons = Object.values(data.simpleIcons).map((icon) => (
     <a key={icon.slug} href="#" onClick={(e) => e.preventDefault()}>
-      <Image
+      <img
         height={52}
         width={52}
         src={`https://cdn.simpleicons.org/${icon.slug}/3b82f6`}
         alt={icon.title}
-        unoptimized
+        loading="eager"
       />
     </a>
   ));
@@ -83,43 +92,14 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
   return <Cloud {...cloudProps}>{icons}</Cloud>;
 });
 
-const MobileIconGrid = memo(function MobileIconGrid({
-  data,
-}: {
-  data: IconData;
-}) {
-  return (
-    <div className="flex flex-wrap items-center justify-center gap-4 p-4">
-      {Object.values(data.simpleIcons).map((icon) => (
-        <Image
-          key={icon.slug}
-          height={32}
-          width={32}
-          src={`https://cdn.simpleicons.org/${icon.slug}/3b82f6`}
-          alt={icon.title}
-          unoptimized
-        />
-      ))}
-    </div>
-  );
-});
-
 export default function Skills() {
   const [data, setData] = useState<IconData | null>(null);
   const [error, setError] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     fetchSimpleIcons({ slugs: SLUGS })
       .then((res) => setData(res as IconData))
       .catch(() => setError(true));
-  }, []);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
   }, []);
 
   return (
@@ -143,11 +123,7 @@ export default function Skills() {
 
             <div className="relative z-0 flex h-full w-full items-center justify-center">
               {data ? (
-                isMobile ? (
-                  <MobileIconGrid data={data} />
-                ) : (
-                  <StaticCloud data={data} />
-                )
+                <StaticCloud data={data} />
               ) : error ? (
                 <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-30">
                   Ошибка загрузки
