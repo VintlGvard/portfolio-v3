@@ -1,5 +1,3 @@
-'use client';
-
 import SectionContainer from '@/components/ui/SectionContainer';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ArrowIcon from '@/components/ui/ArrowIcon';
@@ -26,7 +24,7 @@ const PROJECTS = [
     link: '#',
     tech: 'Заглушка',
   },
-] as const;
+];
 
 export default function Projects() {
   return (
@@ -36,7 +34,7 @@ export default function Projects() {
           <SectionHeader index="02" label="Проекты" />
         </div>
 
-        <h2 className="mb-20 text-4xl font-semibold tracking-tighter sm:text-5xl">
+        <h2 className="mb-12 text-3xl font-semibold tracking-tighter sm:mb-20 sm:text-5xl">
           Проекты <span className="font-light italic text-blue-500">&</span>{' '}
           Кейсы
         </h2>
@@ -46,15 +44,15 @@ export default function Projects() {
             <a
               key={p.id}
               href={p.link}
-              className="group flex flex-col justify-between border-b border-white/10 py-10 transition-all hover:px-2 md:flex-row md:items-center"
+              className="group flex flex-col justify-between border-b border-white/10 py-8 transition-all md:hover:px-2 md:flex-row md:items-center md:py-10"
             >
-              <div className="flex items-start gap-8">
+              <div className="flex items-start gap-4 sm:gap-8">
                 <span className="mt-2 font-mono text-[10px] uppercase tracking-widest text-gray-500">
                   [{p.id}]
                 </span>
 
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-medium tracking-tight transition-colors duration-300 group-hover:text-blue-500">
+                  <h3 className="text-2xl font-medium tracking-tight transition-colors duration-300 group-hover:text-blue-500 sm:text-3xl">
                     {p.title}
                   </h3>
                   <p className="max-w-sm text-sm font-light leading-relaxed text-gray-500 transition-colors group-hover:text-gray-400">
@@ -63,7 +61,7 @@ export default function Projects() {
                 </div>
               </div>
 
-              <div className="mt-8 flex items-center gap-12 md:mt-0">
+              <div className="mt-6 flex items-center gap-6 md:mt-0 md:gap-12">
                 <div className="flex flex-col items-start font-mono md:items-end">
                   <span className="mb-1 text-[9px] uppercase tracking-[0.2em] text-gray-600">
                     Stack

@@ -14,7 +14,7 @@ export default function SectionContainer({
   return (
     <section
       id={id}
-      className={`min-h-screen bg-[#050505] px-6 py-20 text-white sm:py-24 ${className}`}
+      className={`min-h-[80vh] bg-background px-4 py-16 text-foreground sm:px-6 sm:py-20 md:min-h-screen md:py-24 ${className}`}
     >
       {children}
     </section>

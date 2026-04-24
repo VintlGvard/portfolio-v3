@@ -27,13 +27,13 @@ export default function Info() {
       <div className="mx-auto max-w-5xl">
         <SectionHeader index="03" label="Обо мне" />
 
-        <div className="grid gap-16 md:grid-cols-[1fr_auto_1fr]">
+        <div className="grid gap-8 md:grid-cols-[1fr_auto_1fr] md:gap-16">
           <div className="space-y-8">
-            <h2 className="text-4xl font-semibold leading-tight tracking-tight">
+            <h2 className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
               Фуллстек разработчик с фокусом на{' '}
               <span className="text-blue-500">результат</span>
             </h2>
-            <div className="space-y-6 text-lg leading-relaxed text-gray-400">
+            <div className="space-y-6 text-base leading-relaxed text-gray-400 sm:text-lg">
               <p>
                 В своей практике я фокусируюсь на этапе запуска и активного
                 развития продукта. Как фуллстек разработчик, я создаю рабочие
@@ -50,7 +50,7 @@ export default function Info() {
 
           <DividerVertical />
 
-          <div className="flex flex-col justify-center space-y-10">
+          <div className="flex flex-col justify-center space-y-8 md:space-y-10">
             {points.map((point, index) => (
               <div key={point.title} className="group">
                 <h3 className="mb-2 flex items-center gap-2 font-medium text-blue-500">
@@ -67,10 +67,10 @@ export default function Info() {
           </div>
         </div>
 
-        <div className="mt-20 rounded-2xl border border-white/5 bg-white/[0.02] p-8 text-center">
+        <div className="mt-12 rounded-2xl border border-white/5 bg-white/[0.02] p-6 text-center sm:mt-20 sm:p-8">
           <p className="italic text-gray-400">
-            &quot;Мой подход строится на гибкости и поиске наиболее эффективных
-            путей реализации идеи&quot;
+            &ldquo;Мой подход строится на гибкости и поиске наиболее эффективных
+            путей реализации идеи&rdquo;
           </p>
         </div>
       </div>

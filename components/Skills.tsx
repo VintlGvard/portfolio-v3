@@ -15,7 +15,7 @@ interface IconData {
   simpleIcons: Record<string, SimpleIcon>;
 }
 
-const SLUGS: string[] = [
+const SLUGS = [
   'javascript',
   'typescript',
   'python',
@@ -85,9 +85,12 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
 
 export default function Skills() {
   const [data, setData] = useState<IconData | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetchSimpleIcons({ slugs: SLUGS }).then((res) => setData(res as IconData));
+    fetchSimpleIcons({ slugs: SLUGS })
+      .then((res) => setData(res as IconData))
+      .catch(() => setError(true));
   }, []);
 
   return (
@@ -98,10 +101,10 @@ export default function Skills() {
       <div className="relative z-10 mx-auto w-full max-w-5xl">
         <SectionHeader index="01" label="Технологический стек" />
 
-        <div className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-[1.2fr_1fr]">
-          <div className="group relative flex min-h-[380px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.01] sm:min-h-[460px] md:min-h-[520px] lg:min-h-[580px]">
+        <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
+          <div className="group relative flex min-h-[250px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.01] sm:min-h-[380px] md:min-h-[460px] lg:min-h-[520px]">
             <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <div className="absolute h-[1px] w-full bg-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)] animate-scan-line" />
+              <div className="absolute h-[1px] w-full bg-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)] animate-scan" />
             </div>
 
             <div className="absolute top-0 left-0 z-20 h-2 w-2 border-t border-l border-blue-500" />
@@ -109,9 +112,13 @@ export default function Skills() {
             <div className="absolute bottom-0 left-0 z-20 h-2 w-2 border-b border-l border-white/20" />
             <div className="absolute bottom-0 right-0 z-20 h-2 w-2 border-b border-r border-blue-500" />
 
-            <div className="relative z-0 flex h-full w-full max-w-[440px] items-center justify-center">
+            <div className="relative z-0 flex h-full w-full max-w-[min(440px,100%)] items-center justify-center">
               {data ? (
                 <StaticCloud data={data} />
+              ) : error ? (
+                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-30">
+                  Ошибка загрузки
+                </div>
               ) : (
                 <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-20">
                   Загрузка_модулей...
@@ -190,16 +197,6 @@ export default function Skills() {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scan-line {
-          0% { transform: translateY(-10px); }
-          100% { transform: translateY(800px); }
-        }
-        .animate-scan-line {
-          animation: scan-line 5s linear infinite;
-        }
-      `}</style>
     </SectionContainer>
   );
 }
