@@ -1,12 +1,20 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import type { ReactNode } from 'react';
 
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-space-grotesk',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
+  weight: ['300', '400', '500', '700'],
 });
 
 export const viewport: Viewport = {
@@ -41,8 +49,11 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="ru" className={`${inter.variable} scroll-smooth`}>
-      <body className="font-sans">{children}</body>
+    <html
+      lang="ru"
+      className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} scroll-smooth`}
+    >
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

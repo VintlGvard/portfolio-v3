@@ -6,7 +6,7 @@ export default function ArrowIcon() {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       className="rotate-45"
       aria-hidden="true"
     >

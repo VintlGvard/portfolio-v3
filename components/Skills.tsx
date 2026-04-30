@@ -48,6 +48,25 @@ const SLUGS = [
   'unity',
 ];
 
+const ICON_COLORS = [
+  'ff2d6f',
+  'ff6b9d',
+  'e8457a',
+  '4a8c5c',
+  'ff2d6f',
+  '6ba38a',
+  'ff8ab5',
+  '2d4a2d',
+];
+
+function getIconColor(slug: string): string {
+  let hash = 0;
+  for (let i = 0; i < slug.length; i++) {
+    hash = slug.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return ICON_COLORS[Math.abs(hash) % ICON_COLORS.length];
+}
+
 const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
   const cloudProps: Omit<ICloud, 'children'> = {
     containerProps: {
@@ -82,7 +101,7 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
       <img
         height={52}
         width={52}
-        src={`https://cdn.simpleicons.org/${icon.slug}/3b82f6`}
+        src={`https://cdn.simpleicons.org/${icon.slug}/${getIconColor(icon.slug)}`}
         alt={icon.title}
         loading="eager"
       />
@@ -91,6 +110,33 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
 
   return <Cloud {...cloudProps}>{icons}</Cloud>;
 });
+
+const TECH_CATEGORIES = [
+  {
+    label: 'Frontend',
+    tech: 'Next.js, React, TypeScript, Tailwind',
+    color: 'bg-accent-pink',
+    textColor: 'text-accent-pink',
+  },
+  {
+    label: 'Backend',
+    tech: 'Node.js, PHP, Python, Django',
+    color: 'bg-accent-olive',
+    textColor: 'text-accent-olive',
+  },
+  {
+    label: 'Data',
+    tech: 'PostgreSQL, MongoDB, Supabase',
+    color: 'bg-accent-pink/70',
+    textColor: 'text-accent-pink/70',
+  },
+  {
+    label: 'DevOps',
+    tech: 'Docker, GitLab CI, Nginx',
+    color: 'bg-accent-olive/70',
+    textColor: 'text-accent-olive/70',
+  },
+] as const;
 
 export default function Skills() {
   const [data, setData] = useState<IconData | null>(null);
@@ -111,25 +157,34 @@ export default function Skills() {
         <SectionHeader index="01" label="Технологический стек" />
 
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
-          <div className="group relative flex min-h-[250px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.01] sm:min-h-[380px] md:min-h-[460px] lg:min-h-[520px]">
+          <div
+            className="group relative flex min-h-[250px] items-center justify-center overflow-hidden border-2 border-foreground/10 bg-foreground/[0.01] sm:min-h-[380px] md:min-h-[460px] lg:min-h-[520px]"
+            style={{ borderRadius: '0' }}
+          >
             <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <div className="absolute h-[1px] w-full bg-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.2)] animate-scan" />
+              <div className="absolute h-[2px] w-full bg-gradient-to-r from-accent-pink/20 via-accent-olive/15 to-accent-pink/20 shadow-[0_0_15px_rgba(255,45,111,0.1)] animate-scan" />
             </div>
 
-            <div className="absolute top-0 left-0 z-20 h-2 w-2 border-t border-l border-blue-500" />
-            <div className="absolute top-0 right-0 z-20 h-2 w-2 border-t border-r border-white/20" />
-            <div className="absolute bottom-0 left-0 z-20 h-2 w-2 border-b border-l border-white/20" />
-            <div className="absolute bottom-0 right-0 z-20 h-2 w-2 border-b border-r border-blue-500" />
+            <div className="absolute top-0 left-0 z-20 h-4 w-4 border-t-2 border-l-2 border-accent-pink" />
+            <div className="absolute top-0 right-0 z-20 h-4 w-4 border-t-2 border-r-2 border-accent-olive/40" />
+            <div className="absolute bottom-0 left-0 z-20 h-4 w-4 border-b-2 border-l-2 border-accent-olive/40" />
+            <div className="absolute bottom-0 right-0 z-20 h-4 w-4 border-b-2 border-r-2 border-accent-pink" />
+
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute left-[10%] top-[20%] h-32 w-32 rounded-full bg-accent-pink/[0.04] blur-[60px]" />
+              <div className="absolute bottom-[15%] right-[15%] h-28 w-28 rounded-full bg-accent-olive/[0.05] blur-[50px]" />
+              <div className="absolute left-[50%] top-[60%] h-24 w-24 rounded-full bg-accent-pink/[0.03] blur-[40px]" />
+            </div>
 
             <div className="relative z-0 flex h-full w-full items-center justify-center">
               {data ? (
                 <StaticCloud data={data} />
               ) : error ? (
-                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-30">
+                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/50">
                   Ошибка загрузки
                 </div>
               ) : (
-                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] opacity-20">
+                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/30">
                   Загрузка_модулей...
                 </div>
               )}
@@ -137,52 +192,60 @@ export default function Skills() {
 
             <div className="pointer-events-none absolute bottom-4 right-4 z-30 hidden font-mono text-right sm:block">
               <div className="flex flex-col items-end gap-1">
-                <p className="text-[9px] uppercase tracking-widest text-blue-500 opacity-50">
+                <p className="text-[9px] uppercase tracking-widest text-accent-pink/50">
                   System_Status
                 </p>
-                <p className="border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-[11px] uppercase tracking-tighter text-white">
+                <p className="border border-accent-pink/20 bg-accent-pink/5 px-3 py-1.5 text-[11px] uppercase tracking-tighter text-foreground">
                   Выбираю стек для нового проекта
                   <span className="animate-pulse">...</span>
                 </p>
               </div>
+            </div>
+
+            <div className="pointer-events-none absolute left-0 top-[20%] h-[40%] w-[2px]">
+              <div className="h-1/2 w-full bg-accent-pink/20" />
+              <div className="h-1/2 w-full bg-accent-olive/20" />
             </div>
           </div>
 
           <div className="flex flex-col justify-between gap-10 py-2">
             <div className="space-y-8">
               <div>
-                <h2 className="text-3xl font-semibold leading-tight tracking-tight uppercase sm:text-4xl">
+                <h2
+                  className="text-3xl font-bold leading-tight tracking-[-0.02em] uppercase sm:text-4xl"
+                  style={{ letterSpacing: '-0.02em' }}
+                >
                   Архитектура <br />
-                  <span className="font-serif font-light italic text-blue-500">
+                  <span
+                    className="font-mono font-light italic text-accent-pink"
+                    style={{ letterSpacing: '0.05em' }}
+                  >
                     решений
                   </span>
                 </h2>
-                <p className="mt-5 max-w-md text-base font-light leading-relaxed text-gray-400 sm:text-lg">
+                <p className="mt-5 max-w-md text-base font-light leading-relaxed text-muted sm:text-lg">
                   Мой стек — это не просто список инструментов, а выверенная
                   экосистема для быстрого запуска продуктов
                 </p>
               </div>
 
               <div className="space-y-5 font-mono">
-                {[
-                  {
-                    label: 'Frontend',
-                    tech: 'Next.js, React, TypeScript, Tailwind',
-                  },
-                  { label: 'Backend', tech: 'Node.js, PHP, Python, Django' },
-                  { label: 'Data', tech: 'PostgreSQL, MongoDB, Supabase' },
-                  { label: 'DevOps', tech: 'Docker, GitLab CI, Nginx' },
-                ].map((item) => (
+                {TECH_CATEGORIES.map((item) => (
                   <div
                     key={item.label}
-                    className="group flex items-start gap-3"
+                    className="group flex items-start gap-3 transition-all duration-300 hover:translate-x-1"
                   >
-                    <div className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-blue-500 transition-transform duration-300 group-hover:scale-150" />
+                    <div
+                      className={`mt-1.5 h-2 w-2 ${item.color} transition-transform duration-300 group-hover:scale-150 group-hover:rotate-45`}
+                      style={{ borderRadius: '0' }}
+                    />
                     <div>
-                      <p className="mb-0.5 text-[10px] uppercase tracking-widest text-gray-500">
+                      <p
+                        className={`mb-0.5 text-[10px] uppercase tracking-[0.3em] ${item.textColor}/60`}
+                      >
                         {item.label}
                       </p>
-                      <p className="text-sm font-medium italic tracking-tight text-white/90">
+                      <p className="text-sm font-medium italic tracking-tight text-foreground/80">
                         {item.tech}
                       </p>
                     </div>
@@ -191,15 +254,18 @@ export default function Skills() {
               </div>
             </div>
 
-            <div className="mt-4 space-y-3 border-l border-blue-500/50 bg-blue-500/5 p-5 font-mono text-[10px] uppercase tracking-widest sm:mt-8">
-              <div className="flex justify-between text-blue-400">
+            <div
+              className="mt-4 space-y-3 border-l-2 border-accent-pink/30 bg-accent-pink/[0.03] p-5 font-mono text-[10px] uppercase tracking-widest sm:mt-8"
+              style={{ borderRadius: '0' }}
+            >
+              <div className="flex justify-between text-accent-pink/70">
                 <span>Подбор решения для нового проекта</span>
-                <span className="text-white">Оптимально</span>
+                <span className="text-foreground">Оптимально</span>
               </div>
-              <div className="relative h-[1px] w-full overflow-hidden bg-white/10">
-                <div className="absolute left-0 top-0 h-full w-full bg-blue-500 shadow-[0_0_10px_#3b82f6] animate-pulse" />
+              <div className="relative h-[2px] w-full overflow-hidden bg-foreground/10">
+                <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-accent-pink via-accent-olive to-accent-pink shadow-[0_0_10px_rgba(255,45,111,0.2)] animate-pulse" />
               </div>
-              <p className="text-[9px] leading-tight tracking-tighter text-gray-500 normal-case italic">
+              <p className="text-[9px] leading-tight tracking-tighter text-muted/50 normal-case italic">
                 Адаптированный стек под сверхбыстрый MVP подход
               </p>
             </div>

@@ -1,20 +1,76 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #050505;
-  --foreground: #ededed;
+  --background: #0a0f0a;
+  --foreground: #f0ebe3;
+  --accent-pink: #ff2d6f;
+  --accent-olive: #2d4a2d;
+  --muted: #6b7b6b;
+  --grain-opacity: 0.04;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-olive: var(--accent-olive);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
   --animate-scan: scan 8s linear infinite;
+  --animate-grain: grain 0.5s steps(6) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-drift: drift 12s ease-in-out infinite alternate;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+}
+
+* {
+  cursor: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  animation: grain 0.5s steps(6) infinite;
+  mix-blend-mode: overlay;
+}
+
+::selection {
+  background: var(--accent-pink);
+  color: var(--background);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-olive);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-pink);
 }
 
 @keyframes scan {
@@ -24,4 +80,104 @@ body {
   100% {
     transform: translateY(800px);
   }
+}
+
+@keyframes grain {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-5%, -10%);
+  }
+  20% {
+    transform: translate(-15%, 5%);
+  }
+  30% {
+    transform: translate(7%, -25%);
+  }
+  40% {
+    transform: translate(-5%, 25%);
+  }
+  50% {
+    transform: translate(-15%, 10%);
+  }
+  60% {
+    transform: translate(15%, 0%);
+  }
+  70% {
+    transform: translate(0%, 15%);
+  }
+  80% {
+    transform: translate(3%, 35%);
+  }
+  90% {
+    transform: translate(-10%, 10%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(0.5deg);
+  }
+  66% {
+    transform: translateY(4px) rotate(-0.3deg);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, -20px) scale(1.05);
+  }
+  100% {
+    transform: translate(-20px, 10px) scale(0.95);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.swiss-underline {
+  position: relative;
+  display: inline;
+}
+
+.swiss-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: var(--accent-pink);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.swiss-underline:hover::after {
+  transform: scaleX(1);
+}
+
+.brutal-border {
+  border: 2px solid var(--foreground);
+  border-radius: 0;
+}
+
+.blend-heading {
+  mix-blend-mode: difference;
 }
