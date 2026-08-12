@@ -1,6 +1,27 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+
+const SELECTOR =
+  'a, button, [role="button"], input, textarea, select, [data-cursor-hover]';
+
+function subscribe(cb: () => void) {
+  const mql = window.matchMedia(
+    '(pointer: coarse), (prefers-reduced-motion: reduce)',
+  );
+  mql.addEventListener('change', cb);
+  return () => mql.removeEventListener('change', cb);
+}
+
+function getSnapshot() {
+  return window.matchMedia(
+    '(pointer: coarse), (prefers-reduced-motion: reduce)',
+  ).matches;
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -10,8 +31,14 @@ export default function CustomCursor() {
   const pos = useRef({ x: -100, y: -100 });
   const trailPos = useRef({ x: -100, y: -100 });
 
+  const isTouchDevice = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
   useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    if (isTouchDevice) return;
 
     const handleMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY };
@@ -27,25 +54,22 @@ export default function CustomCursor() {
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
 
+    const attached = new WeakSet<EventTarget>();
+
+    function attachToElement(el: Element) {
+      if (attached.has(el)) return;
+      attached.add(el);
+      el.addEventListener('mouseenter', handleHoverStart);
+      el.addEventListener('mouseleave', handleHoverEnd);
+    }
+
     const observer = new MutationObserver(() => {
-      const interactives = document.querySelectorAll(
-        'a, button, [role="button"], input, textarea, select, [data-cursor-hover]'
-      );
-      interactives.forEach((el) => {
-        el.addEventListener('mouseenter', handleHoverStart);
-        el.addEventListener('mouseleave', handleHoverEnd);
-      });
+      document.querySelectorAll(SELECTOR).forEach(attachToElement);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    const interactives = document.querySelectorAll(
-      'a, button, [role="button"], input, textarea, select, [data-cursor-hover]'
-    );
-    interactives.forEach((el) => {
-      el.addEventListener('mouseenter', handleHoverStart);
-      el.addEventListener('mouseleave', handleHoverEnd);
-    });
+    document.querySelectorAll(SELECTOR).forEach(attachToElement);
 
     let rafId: number;
     const animate = () => {
@@ -68,17 +92,20 @@ export default function CustomCursor() {
       window.removeEventListener('mouseup', handleMouseUp);
       cancelAnimationFrame(rafId);
       observer.disconnect();
-      interactives.forEach((el) => {
+      document.querySelectorAll(SELECTOR).forEach((el) => {
         el.removeEventListener('mouseenter', handleHoverStart);
         el.removeEventListener('mouseleave', handleHoverEnd);
       });
     };
-  }, []);
+  }, [isTouchDevice]);
+
+  if (isTouchDevice) return null;
 
   return (
     <>
       <div
         ref={cursorRef}
+        aria-hidden="true"
         className="pointer-events-none fixed left-0 top-0 z-[10000] -translate-x-1/2 -translate-y-1/2"
         style={{ willChange: 'transform' }}
       >
@@ -96,6 +123,7 @@ export default function CustomCursor() {
 
       <div
         ref={trailRef}
+        aria-hidden="true"
         className="pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2"
         style={{ willChange: 'transform' }}
       >

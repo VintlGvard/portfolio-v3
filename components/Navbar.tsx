@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const NAV_ITEMS = [
   { label: 'Старт', href: '#hero' },
@@ -15,6 +16,7 @@ type NavHref = (typeof NAV_ITEMS)[number]['href'];
 
 export default function Navbar() {
   const [activeSection, setActiveSection] = useState<NavHref | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,6 +40,7 @@ export default function Navbar() {
   return (
     <div className="pointer-events-none fixed bottom-4 left-0 z-[100] flex w-full justify-center px-2 font-sans sm:bottom-10 sm:px-4">
       <nav
+        aria-label="Основная навигация"
         className="pointer-events-auto relative flex items-center gap-0 border-2 border-foreground/10 bg-background/80 p-1 backdrop-blur-xl transition-all duration-500 hover:border-foreground/20 sm:gap-0 sm:p-1"
         style={{ borderRadius: '0' }}
       >
@@ -51,7 +54,7 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              aria-current={isActive ? 'page' : undefined}
+              aria-current={isActive ? 'location' : undefined}
               className={`group relative px-3 py-2 transition-all duration-300 sm:px-5 sm:py-2.5 ${
                 isActive
                   ? 'text-foreground'
@@ -64,7 +67,15 @@ export default function Navbar() {
               </span>
 
               {isActive && (
-                <div className="absolute inset-0 z-0 bg-foreground/[0.06] border-b-2 border-accent-pink transition-all duration-500" />
+                <motion.div
+                  layoutId="nav-active-indicator"
+                  className="absolute inset-0 z-0 bg-foreground/[0.06] border-b-2 border-accent-pink"
+                  transition={
+                    prefersReducedMotion
+                      ? { duration: 0 }
+                      : { type: 'spring', stiffness: 380, damping: 30 }
+                  }
+                />
               )}
 
               <div

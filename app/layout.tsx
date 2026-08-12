@@ -11,7 +11,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+  subsets: ['latin', 'cyrillic'],
   display: 'swap',
   variable: '--font-jetbrains-mono',
   weight: ['300', '400', '500', '700'],
@@ -24,6 +24,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://vintlgvard.com'),
   title: 'VintlGvard — Смирнов Виталий, Full‑Stack разработчик',
   description:
     'Портфолио VintlGvard (Смирнов Виталий) — Full‑Stack разработчик. Проектирую архитектуру, собираю MVP, прототипы и продакшен‑решения на Next.js, React, Node.js, Python и современном стеке.',
@@ -40,6 +41,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'VintlGvard — Full‑Stack разработчик',
     description: 'Портфолио VintlGvard — MVP, прототипы и продакшен‑решения.',
+  },
+  alternates: {
+    canonical: '/',
   },
 };
 

@@ -5,10 +5,10 @@ import ArrowIcon from '@/components/ui/ArrowIcon';
 const PROJECTS = [
   {
     id: '01',
-    title: 'Заглушка 1',
-    desc: 'Заглушка',
-    link: '#',
-    tech: 'Заглушка',
+    title: 'BreweryX Recipe Generator',
+    desc: 'Генератор YAML-рецептов для BreweryX: форма, live preview и экспорт конфигурации прямо в браузере',
+    link: 'https://github.com/VintlGvard/breweryx-recipe-gen',
+    tech: 'Next.js · TypeScript · Tailwind',
   },
   {
     id: '02',
@@ -52,12 +52,18 @@ export default function Projects() {
         </h2>
 
         <div className="flex flex-col border-t-2 border-foreground/10">
-          {PROJECTS.map((p, idx) => (
-            <a
-              key={p.id}
-              href={p.link}
-              className="group relative flex flex-col justify-between border-b-2 border-foreground/10 py-8 transition-all duration-300 md:hover:pl-4 md:flex-row md:items-center md:py-10"
-            >
+          {PROJECTS.map((p, idx) => {
+            const isExternal = p.link.startsWith('http');
+            return (
+              <a
+                key={p.id}
+                href={p.link}
+                {...(isExternal
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
+                aria-label={`Открыть проект «${p.title}»${isExternal ? ' (внешняя ссылка)' : ''}`}
+                className="group relative flex flex-col justify-between border-b-2 border-foreground/10 py-8 transition-all duration-300 md:hover:pl-4 md:flex-row md:items-center md:py-10"
+              >
               <div
                 className="absolute inset-0 z-0 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
                 style={{
@@ -98,7 +104,8 @@ export default function Projects() {
                 </div>
               </div>
             </a>
-          ))}
+            );
+          })}
         </div>
       </div>
     </SectionContainer>

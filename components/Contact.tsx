@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import SectionContainer from '@/components/ui/SectionContainer';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ArrowIcon from '@/components/ui/ArrowIcon';
@@ -41,6 +42,16 @@ async function copyToClipboard(text: string): Promise<boolean> {
 export default function ContactPage() {
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  const fadeUp = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
+  };
+
+  const stagger = {
+    visible: { transition: { staggerChildren: 0.08 } },
+  };
 
   useEffect(() => {
     return () => {
@@ -62,7 +73,7 @@ export default function ContactPage() {
       id="contact"
       className="relative flex items-center overflow-hidden"
     >
-      <div className="pointer-events-none absolute inset-0 opacity-[0.03]">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.03]" aria-hidden="true">
         <div
           className="absolute inset-0"
           style={{
@@ -73,13 +84,13 @@ export default function ContactPage() {
         />
       </div>
 
-      <div className="pointer-events-none absolute right-[5%] top-[8%] select-none">
+      <div className="pointer-events-none absolute right-[5%] top-[8%] select-none" aria-hidden="true">
         <span className="font-mono text-[18vw] font-bold leading-none text-foreground/[0.012]">
           04
         </span>
       </div>
 
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div
           className="absolute right-[10%] top-[20%] h-32 w-32 border-2 border-accent-pink/5 rotate-12 animate-float"
           style={{ borderRadius: '0' }}
@@ -99,13 +110,19 @@ export default function ContactPage() {
         <SectionHeader index="04" label="Контакты" />
 
         <div className="grid gap-10 md:grid-cols-2 md:gap-16">
-          <div className="space-y-8 sm:space-y-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="space-y-8 sm:space-y-10"
+          >
             <div className="space-y-6">
               <div
                 className="inline-flex items-center gap-2 border border-accent-pink/20 bg-accent-pink/[0.03] px-4 py-1.5"
                 style={{ borderRadius: '0' }}
               >
-                <span className="relative flex h-2 w-2">
+                <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span
                     className="absolute inline-flex h-full w-full animate-ping bg-accent-pink/60"
                     style={{ borderRadius: '0' }}
@@ -120,7 +137,8 @@ export default function ContactPage() {
                 </span>
               </div>
 
-              <h2
+              <motion.h2
+                variants={fadeUp}
                 className="text-3xl font-bold leading-[1.1] tracking-[-0.03em] uppercase sm:text-4xl md:text-5xl lg:text-6xl"
                 style={{ letterSpacing: '-0.03em' }}
               >
@@ -131,14 +149,14 @@ export default function ContactPage() {
                 >
                   вызовам и идеям.
                 </span>
-              </h2>
-              <p className="max-w-md text-base font-light leading-relaxed text-muted sm:text-lg">
+              </motion.h2>
+              <motion.p variants={fadeUp} className="max-w-md text-base font-light leading-relaxed text-muted sm:text-lg">
                 Если у вас есть проект, требующий быстрого прототипирования или
                 свежих идей — пишите в удобном вам мессенджере
-              </p>
+              </motion.p>
             </div>
 
-            <div className="flex flex-wrap gap-4 border-t-2 border-foreground/5 pt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-muted/50 sm:gap-8 sm:pt-8">
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 border-t-2 border-foreground/5 pt-6 font-mono text-[10px] uppercase tracking-[0.3em] text-muted/50 sm:gap-8 sm:pt-8">
               <div>
                 Локация:{' '}
                 <span className="text-foreground/40">РФ / Татарстан</span>
@@ -146,13 +164,21 @@ export default function ContactPage() {
               <div>
                 Время: <span className="text-foreground/40">UTC+3</span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="flex flex-col">
-            <button
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={stagger}
+            className="flex flex-col"
+          >
+            <motion.button
+              variants={fadeUp}
+              type="button"
               onClick={copyEmail}
-              className="group relative flex items-center justify-between border-b-2 border-foreground/10 px-2 py-5 transition-all duration-300 md:hover:bg-accent-pink/[0.02] sm:px-4 sm:py-6 md:py-8"
+              className="group relative flex items-center justify-between border-b-2 border-foreground/10 px-2 py-5 transition-all duration-300 md:hover:bg-accent-pink/[0.02] sm:px-4 sm:py-6 md:py-8 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
             >
               <div
                 className="absolute inset-0 z-0 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
@@ -171,6 +197,7 @@ export default function ContactPage() {
                 </span>
               </div>
               <div
+                aria-live="polite"
                 className="relative z-10 border-2 border-foreground/10 bg-background px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted/50 transition-all group-hover:border-accent-pink/30"
                 style={{ borderRadius: '0' }}
               >
@@ -182,15 +209,16 @@ export default function ContactPage() {
                   </span>
                 )}
               </div>
-            </button>
+            </motion.button>
 
             {CONTACTS.map((s) => (
-              <a
+              <motion.a
                 key={s.label}
+                variants={fadeUp}
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative flex items-center justify-between border-b-2 border-foreground/10 px-2 py-5 transition-all duration-300 sm:px-4 sm:py-6 md:py-8"
+                className="group relative flex items-center justify-between border-b-2 border-foreground/10 px-2 py-5 transition-all duration-300 sm:px-4 sm:py-6 md:py-8 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
               >
                 <div
                   className="absolute inset-0 z-0 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
@@ -209,12 +237,12 @@ export default function ContactPage() {
                     {s.value}
                   </span>
                 </div>
-                <div className="relative z-10 translate-x-4 text-accent-pink opacity-0 transition-all duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100 md:group-hover:rotate-0 rotate-45">
+                <div className="relative z-10 translate-x-4 text-accent-pink opacity-0 transition-all duration-300 md:group-hover:translate-x-0 md:group-hover:opacity-100 md:group-hover:rotate-0 rotate-45" aria-hidden="true">
                   <ArrowIcon />
                 </div>
-              </a>
+              </motion.a>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </SectionContainer>

@@ -1,19 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const words = ['ПРОДУКТ', 'АРХИТЕКТУРУ', 'ПРОТОТИПЫ', 'РЕШЕНИЯ'] as const;
 
 export default function Hero() {
   const [index, setIndex] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
+    if (prefersReducedMotion) return;
+
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % words.length);
     }, 2000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [prefersReducedMotion]);
+
+  const duration = prefersReducedMotion ? 0 : 0.6;
+  const ease = [0.23, 1, 0.32, 1];
 
   return (
     <section
@@ -22,6 +29,7 @@ export default function Hero() {
     >
       <div className="pointer-events-none absolute inset-0 flex select-none items-center justify-center opacity-[0.02]">
         <h2
+          aria-hidden="true"
           className="text-[25vw] font-black uppercase tracking-[0.2em] animate-pulse-slow sm:text-[50vw]"
           style={{ transform: 'rotate(-5deg)' }}
         >
@@ -82,61 +90,103 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-[1600px]">
-        <div className="flex flex-col items-center sm:items-start">
-          <h2 className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.6em] text-accent-pink sm:text-left sm:text-xs">
+      <motion.div
+        className="relative z-10 mx-auto w-full max-w-[1600px]"
+        initial={prefersReducedMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.4 }}
+      >
+        <div className="flex min-w-0 flex-col items-center sm:items-start">
+          <motion.h2
+            className="mb-6 text-center font-mono text-[10px] uppercase tracking-[0.6em] text-accent-pink sm:text-left sm:text-xs"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration, ease }}
+          >
             Смирнов Виталий | VintlGvard
-          </h2>
+          </motion.h2>
 
           <h1
-            className="text-center text-[14vw] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:text-left sm:text-[12vw]"
+            className="max-w-full text-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:text-left sm:text-[clamp(3rem,12vw,10rem)]"
             style={{ letterSpacing: '-0.04em' }}
           >
-            Я <span className="text-muted not-italic">собираю</span> <br />
-            <span className="relative flex h-[1.3em] w-full items-center justify-center overflow-hidden text-foreground not-italic">
-              {words.map((word, i) => {
-                const isActive = i === index;
-
-                return (
-                  <span
-                    key={word}
-                    className={`absolute left-1/2 -translate-x-1/2 transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${
-                      isActive
-                        ? 'translate-y-0 opacity-100'
-                        : i < index
-                          ? '-translate-y-full rotate-3 opacity-0 blur-md'
-                          : 'translate-y-full -rotate-3 opacity-0 blur-md'
-                    }`}
-                  >
-                    <span
-                      className={
-                        isActive
-                          ? 'bg-gradient-to-r from-foreground via-foreground to-accent-pink bg-clip-text text-transparent'
-                          : ''
-                      }
-                    >
-                      {word}
-                    </span>
+            <motion.span
+              className="inline-block mr-[0.3em]"
+              initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration,
+                ease,
+                delay: prefersReducedMotion ? 0 : 0.08,
+              }}
+            >
+              Я
+            </motion.span>
+            <span className="text-muted not-italic">собираю</span>{' '}
+            <br />
+            <span className="relative flex h-[1.3em] w-full max-w-full items-center justify-center overflow-hidden text-foreground not-italic">
+              <span className="sr-only" aria-live="polite" aria-atomic="true">
+                {words[index]}
+              </span>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  aria-hidden="true"
+                  key={words[index]}
+                  initial={
+                    prefersReducedMotion
+                      ? { opacity: 1, y: 0, rotate: 0, filter: 'blur(0px)' }
+                      : { y: 40, opacity: 0, rotate: 3, filter: 'blur(8px)' }
+                  }
+                  animate={{
+                    y: 0,
+                    opacity: 1,
+                    rotate: 0,
+                    filter: 'blur(0px)',
+                  }}
+                  exit={
+                    prefersReducedMotion
+                      ? { opacity: 1, y: 0, rotate: 0, filter: 'blur(0px)' }
+                      : { y: -40, opacity: 0, rotate: -3, filter: 'blur(8px)' }
+                  }
+                  transition={{ duration, ease }}
+                  className="absolute left-1/2 -translate-x-1/2"
+                >
+                  <span className="bg-gradient-to-r from-foreground via-foreground to-accent-pink bg-clip-text text-transparent">
+                    {words[index]}
                   </span>
-                );
-              })}
+                </motion.span>
+              </AnimatePresence>
               <span className="opacity-0 tracking-tighter" aria-hidden="true">
                 АРХИТЕКТУРУ
               </span>
             </span>
           </h1>
 
-          <h1
-            className="mt-4 self-center sm:self-end text-[14vw] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:text-[12vw]"
+          <motion.h1
+            className="mt-4 min-w-0 self-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:self-end sm:text-[clamp(3rem,12vw,10rem)]"
             style={{ transform: 'skewX(-3deg)', letterSpacing: '-0.04em' }}
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{
+              duration: prefersReducedMotion ? 0 : 0.6,
+              ease,
+              delay: prefersReducedMotion ? 0 : 0.16,
+            }}
           >
             С <span className="text-accent-pink">НУЛЯ</span>
-          </h1>
+          </motion.h1>
         </div>
 
-        <div
-          className="mt-20 max-w-xl text-center sm:border-l-2 sm:border-accent-pink/30 sm:pl-8 sm:text-left"
+          <motion.div
+            className="mt-20 max-w-xl min-w-0 overflow-hidden text-center sm:border-l-2 sm:border-accent-pink/30 sm:pl-8 sm:text-left"
           style={{ transform: 'rotate(-0.3deg)' }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: prefersReducedMotion ? 0 : 0.6,
+            ease,
+            delay: prefersReducedMotion ? 0 : 0.28,
+          }}
         >
           <p className="text-lg font-light leading-relaxed text-muted sm:text-xl">
             Фуллстек разработчик полного цикла <br />
@@ -144,8 +194,22 @@ export default function Hero() {
               От идеи до деплоя
             </span>
           </p>
-        </div>
-      </div>
+          <nav className="mt-6 flex items-center justify-center gap-4 sm:justify-start" aria-label="Навигация по секциям">
+            <a
+              href="#projects"
+              className="inline-flex items-center gap-2 rounded-sm border border-accent-pink/30 bg-accent-pink/10 px-5 py-2.5 text-sm font-medium text-accent-pink transition-colors hover:bg-accent-pink/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
+            >
+              Проекты
+            </a>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-2 rounded-sm border border-foreground/20 px-5 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+            >
+              Связаться
+            </a>
+          </nav>
+        </motion.div>
+      </motion.div>
 
       <div className="pointer-events-none absolute right-4 top-0 hidden h-full w-[2px] overflow-hidden bg-foreground/5 sm:right-12 sm:block">
         <div className="h-20 w-full bg-accent-pink shadow-[0_0_20px_rgba(255,45,111,0.3)] animate-scan" />
