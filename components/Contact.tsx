@@ -35,12 +35,26 @@ async function copyToClipboard(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text);
     return true;
   } catch {
-    return false;
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch {
+      return false;
+    }
   }
 }
 
 export default function ContactPage() {
   const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
@@ -61,8 +75,15 @@ export default function ContactPage() {
 
   const copyEmail = async () => {
     const ok = await copyToClipboard('me@vintlgvard.com');
-    if (!ok) return;
+    if (!ok) {
+      setCopyFailed(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopyFailed(false), 3000);
+      window.location.href = 'mailto:me@vintlgvard.com';
+      return;
+    }
 
+    setCopyFailed(false);
     setCopied(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setCopied(false), 2000);
@@ -203,6 +224,8 @@ export default function ContactPage() {
               >
                 {copied ? (
                   <span className="text-accent-pink">✓ Скопировано</span>
+                ) : copyFailed ? (
+                  <span className="text-accent-pink">Открыть почту…</span>
                 ) : (
                   <span className="transition-colors md:group-hover:text-foreground">
                     ⎘ Копировать

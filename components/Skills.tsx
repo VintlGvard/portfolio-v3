@@ -49,12 +49,87 @@ const SLUGS = [
   'unity',
 ];
 
+const SLUG_TITLES: Record<string, string> = {
+  javascript: 'JavaScript',
+  typescript: 'TypeScript',
+  python: 'Python',
+  php: 'PHP',
+  nextdotjs: 'Next.js',
+  react: 'React',
+  nodedotjs: 'Node.js',
+  django: 'Django',
+  flask: 'Flask',
+  fastapi: 'FastAPI',
+  postgresql: 'PostgreSQL',
+  mysql: 'MySQL',
+  mongodb: 'MongoDB',
+  supabase: 'Supabase',
+  docker: 'Docker',
+  gitlab: 'GitLab',
+  nginx: 'Nginx',
+  tailwindcss: 'Tailwind CSS',
+  bootstrap: 'Bootstrap',
+  sass: 'Sass',
+  vite: 'Vite',
+  webpack: 'Webpack',
+  jest: 'Jest',
+  intellijidea: 'IntelliJ IDEA',
+  pycharm: 'PyCharm',
+  webstorm: 'WebStorm',
+  postman: 'Postman',
+  sublimetext: 'Sublime Text',
+  figma: 'Figma',
+  notion: 'Notion',
+  unity: 'Unity',
+};
+
+const CACHE_KEY = 'skills-simple-icons-v1';
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function buildFallbackData(): IconData {
+  const simpleIcons: Record<string, SimpleIcon> = {};
+  for (const slug of SLUGS) {
+    simpleIcons[slug] = { slug, title: SLUG_TITLES[slug] ?? slug };
+  }
+  return { simpleIcons };
+}
+
+function readCache(): IconData | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { ts: number; data: IconData };
+    if (!parsed?.data?.simpleIcons || Date.now() - parsed.ts > CACHE_TTL_MS) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+    return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(data: IconData) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch {
+    void 0;
+  }
+}
+
+async function fetchWithTimeout(ms = 8000): Promise<IconData> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('simple-icons timeout')), ms),
+  );
+  const res = await Promise.race([fetchSimpleIcons({ slugs: SLUGS }), timeout]);
+  return res as IconData;
+}
+
 const ICON_COLORS = [
   'ff2d6f',
   'ff6b9d',
   'e8457a',
   '4a8c5c',
-  'ff2d6f',
   '6ba38a',
   'ff8ab5',
   '2d4a2d',
@@ -110,12 +185,36 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
         width={52}
         src={`https://cdn.simpleicons.org/${icon.slug}/${getIconColor(icon.slug)}`}
         alt={icon.title}
-        loading="eager"
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        referrerPolicy="no-referrer"
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
       />
     </a>
   ));
 
   return <Cloud {...cloudProps}>{icons}</Cloud>;
+});
+
+const SkillFallbackGrid = memo(function SkillFallbackGrid() {
+  return (
+    <ul
+      className="grid max-w-full grid-cols-3 gap-2 p-6 sm:grid-cols-4 sm:gap-3 sm:p-8"
+      aria-label="Технологический стек списком"
+    >
+      {SLUGS.map((slug) => (
+        <li
+          key={slug}
+          className="border border-foreground/10 bg-foreground/[0.02] px-2 py-2 text-center font-mono text-[10px] uppercase tracking-[0.15em] text-foreground/70 transition-colors hover:border-accent-pink/40 hover:text-foreground sm:text-[11px]"
+        >
+          {SLUG_TITLES[slug] ?? slug}
+        </li>
+      ))}
+    </ul>
+  );
 });
 
 const TECH_CATEGORIES = [
@@ -147,7 +246,7 @@ const TECH_CATEGORIES = [
 
 export default function Skills() {
   const [data, setData] = useState<IconData | null>(null);
-  const [error, setError] = useState(false);
+  const [failed, setFailed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   const fadeUp = {
@@ -160,10 +259,38 @@ export default function Skills() {
   };
 
   useEffect(() => {
-    fetchSimpleIcons({ slugs: SLUGS })
-      .then((res) => setData(res as IconData))
-      .catch(() => setError(true));
+    let cancelled = false;
+
+    const cached = readCache();
+    if (cached) setData(cached);
+
+    (async () => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const fresh = await fetchWithTimeout(8000);
+          if (!cancelled && fresh?.simpleIcons) {
+            setData(fresh);
+            setFailed(false);
+            writeCache(fresh);
+            return;
+          }
+        } catch {
+          if (attempt === 1 && !cancelled) {
+            if (!readCache()) {
+              setData(buildFallbackData());
+            }
+            setFailed(true);
+          }
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const showStaticGrid = shouldReduceMotion || failed;
 
   return (
     <SectionContainer
@@ -198,12 +325,10 @@ export default function Skills() {
             </div>
 
             <div className="relative z-0 flex h-full w-full items-center justify-center">
-              {data ? (
+              {showStaticGrid ? (
+                <SkillFallbackGrid />
+              ) : data ? (
                 <StaticCloud data={data} />
-              ) : error ? (
-                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/50">
-                  Ошибка загрузки
-                </div>
               ) : (
                 <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/30">
                   Загрузка_модулей...

@@ -36,11 +36,13 @@ export const metadata: Metadata = {
     siteName: 'VintlGvard',
     locale: 'ru_RU',
     type: 'website',
+    images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'VintlGvard — Full‑Stack разработчик',
     description: 'Портфолио VintlGvard — MVP, прототипы и продакшен‑решения.',
+    images: ['/opengraph-image'],
   },
   alternates: {
     canonical: '/',
@@ -57,7 +59,28 @@ export default function RootLayout({ children }: RootLayoutProps) {
       lang="ru"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} scroll-smooth`}
     >
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Person',
+              name: 'Смирнов Виталий',
+              alternateName: 'VintlGvard',
+              url: 'https://vintlgvard.com',
+              jobTitle: 'Full-Stack разработчик',
+              address: { '@type': 'PostalAddress', addressCountry: 'RU' },
+              sameAs: [
+                'https://github.com/VintlGvard',
+                'https://gitlab.com/vintlgvard',
+                'https://t.me/VintlGvard',
+              ],
+            }),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }

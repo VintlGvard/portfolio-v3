@@ -28,13 +28,34 @@ export default function Navbar() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -10% 0px' }
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
     );
 
-    const sections = document.querySelectorAll<HTMLElement>('section[id]');
-    sections.forEach((s) => observer.observe(s));
+    const observed = new WeakSet<Element>();
 
-    return () => observer.disconnect();
+    const observeAll = () => {
+      document.querySelectorAll<HTMLElement>('section[id]').forEach((s) => {
+        if (observed.has(s)) return;
+        observed.add(s);
+        observer.observe(s);
+      });
+    };
+    observeAll();
+    const mo = new MutationObserver((entries) => {
+      for (const entry of entries) {
+        for (const node of entry.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+          if (node.matches?.('section[id]')) observeAll();
+          else if (node.querySelector?.('section[id]')) observeAll();
+        }
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      mo.disconnect();
+    };
   }, []);
 
   return (

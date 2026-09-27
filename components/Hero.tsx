@@ -20,7 +20,7 @@ export default function Hero() {
   }, [prefersReducedMotion]);
 
   const duration = prefersReducedMotion ? 0 : 0.6;
-  const ease = [0.23, 1, 0.32, 1];
+  const ease = [0.23, 1, 0.32, 1] as const;
 
   return (
     <section
@@ -162,7 +162,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          <motion.h1
+          <motion.p
             className="mt-4 min-w-0 self-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:self-end sm:text-[clamp(3rem,12vw,10rem)]"
             style={{ transform: 'skewX(-3deg)', letterSpacing: '-0.04em' }}
             initial={prefersReducedMotion ? false : { opacity: 0 }}
@@ -174,7 +174,7 @@ export default function Hero() {
             }}
           >
             С <span className="text-accent-pink">НУЛЯ</span>
-          </motion.h1>
+          </motion.p>
         </div>
 
           <motion.div
@@ -197,13 +197,13 @@ export default function Hero() {
           <nav className="mt-6 flex items-center justify-center gap-4 sm:justify-start" aria-label="Навигация по секциям">
             <a
               href="#projects"
-              className="inline-flex items-center gap-2 rounded-sm border border-accent-pink/30 bg-accent-pink/10 px-5 py-2.5 text-sm font-medium text-accent-pink transition-colors hover:bg-accent-pink/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
+              className="inline-flex items-center gap-2 rounded-none border border-accent-pink/30 bg-accent-pink/10 px-5 py-2.5 text-sm font-medium text-accent-pink transition-colors hover:bg-accent-pink/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
             >
               Проекты
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 rounded-sm border border-foreground/20 px-5 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+              className="inline-flex items-center gap-2 rounded-none border border-foreground/20 px-5 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             >
               Связаться
             </a>

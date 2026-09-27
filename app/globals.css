@@ -5,7 +5,7 @@
   --foreground: #f0ebe3;
   --accent-pink: #ff2d6f;
   --accent-olive: #2d4a2d;
-  --muted: #6b7b6b;
+  --muted: #8b9b8b;
   --grain-opacity: 0.04;
 }
 
@@ -15,8 +15,9 @@
   --color-accent-pink: var(--accent-pink);
   --color-accent-olive: var(--accent-olive);
   --color-muted: var(--muted);
-  --font-sans: var(--font-space-grotesk);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-space-grotesk), system-ui, -apple-system, 'Segoe UI',
+    Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
   --animate-scan: scan 8s linear infinite;
   --animate-grain: grain 0.5s steps(6) infinite;
   --animate-float: float 6s ease-in-out infinite;
@@ -24,12 +25,14 @@
   --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
 }
 
-* {
+body.custom-cursor-active,
+body.custom-cursor-active * {
   cursor: none !important;
 }
 
 @media (pointer: coarse) {
-  * {
+  body.custom-cursor-active,
+  body.custom-cursor-active * {
     cursor: auto !important;
   }
 }
@@ -50,6 +53,23 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  body::before {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body::before {
+    animation: none;
+    opacity: 0.03;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (max-width: 768px) {
+  .animate-drift {
+    animation-duration: 18s;
   }
 }
 

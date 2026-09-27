@@ -5,18 +5,24 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 const SELECTOR =
   'a, button, [role="button"], input, textarea, select, [data-cursor-hover]';
 
-function subscribe(cb: () => void) {
-  const mql = window.matchMedia(
+function getMatcher() {
+  return window.matchMedia(
     '(pointer: coarse), (prefers-reduced-motion: reduce)',
   );
-  mql.addEventListener('change', cb);
-  return () => mql.removeEventListener('change', cb);
+}
+
+function subscribe(cb: () => void) {
+  const mql = getMatcher();
+  if (typeof mql.addEventListener === 'function') {
+    mql.addEventListener('change', cb);
+    return () => mql.removeEventListener('change', cb);
+  }
+  mql.addListener(cb);
+  return () => mql.removeListener(cb);
 }
 
 function getSnapshot() {
-  return window.matchMedia(
-    '(pointer: coarse), (prefers-reduced-motion: reduce)',
-  ).matches;
+  return getMatcher().matches;
 }
 
 function getServerSnapshot() {
@@ -40,6 +46,8 @@ export default function CustomCursor() {
   useEffect(() => {
     if (isTouchDevice) return;
 
+    document.body.classList.add('custom-cursor-active');
+
     const handleMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY };
     };
@@ -50,9 +58,15 @@ export default function CustomCursor() {
     const handleHoverStart = () => setIsHovering(true);
     const handleHoverEnd = () => setIsHovering(false);
 
-    window.addEventListener('mousemove', handleMove);
+    const handleLeaveWindow = () => {
+      pos.current = { x: -100, y: -100 };
+      setIsHovering(false);
+    };
+
+    window.addEventListener('mousemove', handleMove, { passive: true });
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
+    document.documentElement.addEventListener('mouseleave', handleLeaveWindow);
 
     const attached = new WeakSet<EventTarget>();
 
@@ -77,19 +91,24 @@ export default function CustomCursor() {
       trailPos.current.y += (pos.current.y - trailPos.current.y) * 0.15;
 
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px)`;
+        cursorRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`;
       }
       if (trailRef.current) {
-        trailRef.current.style.transform = `translate(${trailPos.current.x}px, ${trailPos.current.y}px)`;
+        trailRef.current.style.transform = `translate(${trailPos.current.x}px, ${trailPos.current.y}px) translate(-50%, -50%)`;
       }
       rafId = requestAnimationFrame(animate);
     };
     rafId = requestAnimationFrame(animate);
 
     return () => {
+      document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      document.documentElement.removeEventListener(
+        'mouseleave',
+        handleLeaveWindow,
+      );
       cancelAnimationFrame(rafId);
       observer.disconnect();
       document.querySelectorAll(SELECTOR).forEach((el) => {
@@ -106,7 +125,7 @@ export default function CustomCursor() {
       <div
         ref={cursorRef}
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-[10000] -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none fixed left-0 top-0 z-[10000]"
         style={{ willChange: 'transform' }}
       >
         <div
@@ -124,7 +143,7 @@ export default function CustomCursor() {
       <div
         ref={trailRef}
         aria-hidden="true"
-        className="pointer-events-none fixed left-0 top-0 z-[9999] -translate-x-1/2 -translate-y-1/2"
+        className="pointer-events-none fixed left-0 top-0 z-[9999]"
         style={{ willChange: 'transform' }}
       >
         <div
