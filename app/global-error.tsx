@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import GlobalErrorShell, {
   GLOBAL_ERROR_STYLES,
 } from '@/components/ui/GlobalErrorShell';
@@ -28,14 +28,12 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const [timestamp, setTimestamp] = useState('');
   useEffect(() => {
     console.error('[Global Error]', error);
-    setTimestamp(new Date().toISOString());
   }, [error]);
 
   return (
-    <html lang="ru">
+    <html lang="en">
       <head>
         <style>{GLOBAL_ERROR_STYLES}</style>
       </head>
@@ -48,12 +46,16 @@ export default function GlobalError({
       >
         <GlobalErrorShell
           code="500"
-          title="Что-то пошло не так"
+          title="Something went wrong"
           description={
             <>
-              Произошла непредвиденная ошибка на сервере.
+              An unexpected server error occurred.
               <br />
-              Попробуйте обновить страницу.
+              Try refreshing the page.
+              <br />
+              <span style={{ color: 'rgba(107,123,107,0.6)' }}>
+                Произошла непредвиденная ошибка. Попробуйте обновить страницу.
+              </span>
             </>
           }
           terminal={
@@ -63,11 +65,10 @@ export default function GlobalError({
             </p>
           }
           digest={error.digest}
-          timestamp={timestamp}
           action={
             <button onClick={() => reset()} style={BTN}>
               <span>↻</span>
-              <span>Попробовать снова</span>
+              <span>Try again · Попробовать снова</span>
             </button>
           }
         />

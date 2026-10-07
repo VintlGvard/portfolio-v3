@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface ErrorCardProps {
   code: '404' | '500';
@@ -19,11 +19,6 @@ export default function ErrorCard({
   action,
   digest,
 }: ErrorCardProps) {
-  const [timestamp, setTimestamp] = useState('');
-  useEffect(() => {
-    setTimestamp(new Date().toISOString());
-  }, []);
-
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 py-12 text-foreground sm:px-6 md:py-16">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -66,10 +61,7 @@ export default function ErrorCard({
           Error_Code: {code}
         </div>
 
-        <h1
-          className="mb-4 text-[25vw] font-bold leading-none uppercase tracking-[-0.04em] text-foreground/[0.06] sm:text-[20vw] md:text-[15vw]"
-          style={{ letterSpacing: '-0.04em' }}
-        >
+        <h1 className="mb-4 text-[25vw] font-bold leading-none uppercase tracking-[-0.04em] text-foreground/[0.06] sm:text-[20vw] md:text-[15vw]">
           {code}
         </h1>
 
@@ -82,10 +74,7 @@ export default function ErrorCard({
           <div className="h-[2px] w-10 bg-gradient-to-l from-transparent to-accent-pink/30 sm:w-16" />
         </div>
 
-        <h2
-          className="mb-2 text-xl font-bold tracking-[-0.02em] uppercase sm:mb-3 sm:text-2xl md:text-3xl"
-          style={{ letterSpacing: '-0.02em' }}
-        >
+        <h2 className="mb-2 text-xl font-bold tracking-[-0.02em] uppercase sm:mb-3 sm:text-2xl md:text-3xl">
           {title}
         </h2>
         <p className="mb-8 max-w-xs text-xs font-light leading-relaxed text-muted sm:mb-10 sm:max-w-md sm:text-sm md:text-base">
@@ -99,9 +88,6 @@ export default function ErrorCard({
           <div className="space-y-1 text-muted/50">
             {terminal}
             {digest && <p className="text-muted/30">digest: {digest}</p>}
-            {timestamp && (
-              <p className="text-muted/30">timestamp: {timestamp}</p>
-            )}
           </div>
         </div>
 

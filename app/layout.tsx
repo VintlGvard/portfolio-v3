@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import type { ReactNode } from 'react';
+import { LanguageProvider } from '@/lib/i18n';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -25,23 +26,24 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://vintlgvard.com'),
-  title: 'VintlGvard — Смирнов Виталий, Full‑Stack разработчик',
+  title: 'VintlGvard — Vitaly Smirnov, Full-Stack Developer',
   description:
-    'Портфолио VintlGvard (Смирнов Виталий) — Full‑Stack разработчик. Проектирую архитектуру, собираю MVP, прототипы и продакшен‑решения на Next.js, React, Node.js, Python и современном стеке.',
+    'Portfolio of VintlGvard (Vitaly Smirnov) — Full-Stack developer. I design architecture and ship MVPs, prototypes and production solutions with Next.js, React, Node.js, Go, Python and a modern stack.',
   openGraph: {
-    title: 'VintlGvard — Смирнов Виталий, Full‑Stack разработчик',
+    title: 'VintlGvard — Vitaly Smirnov, Full-Stack Developer',
     description:
-      'Портфолио VintlGvard — Full‑Stack разработчик. MVP, прототипы и продакшен‑решения на Next.js, React, Node.js, Python.',
+      'Portfolio of VintlGvard — Full-Stack developer. MVPs, prototypes and production solutions with Next.js, React, Node.js, Go, Python.',
     url: 'https://vintlgvard.com',
     siteName: 'VintlGvard',
-    locale: 'ru_RU',
+    locale: 'en_US',
+    alternateLocale: ['ru_RU'],
     type: 'website',
     images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VintlGvard — Full‑Stack разработчик',
-    description: 'Портфолио VintlGvard — MVP, прототипы и продакшен‑решения.',
+    title: 'VintlGvard — Full-Stack Developer',
+    description: 'Portfolio of VintlGvard — MVPs, prototypes and production solutions.',
     images: ['/opengraph-image'],
   },
   alternates: {
@@ -56,7 +58,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
-      lang="ru"
+      lang="en"
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} scroll-smooth`}
     >
       <body className="font-sans antialiased">
@@ -66,10 +68,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Person',
-              name: 'Смирнов Виталий',
+              name: 'Vitaly Smirnov',
               alternateName: 'VintlGvard',
               url: 'https://vintlgvard.com',
-              jobTitle: 'Full-Stack разработчик',
+              jobTitle: 'Full-Stack developer',
               address: { '@type': 'PostalAddress', addressCountry: 'RU' },
               sameAs: [
                 'https://github.com/VintlGvard',
@@ -79,7 +81,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             }),
           }}
         />
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );

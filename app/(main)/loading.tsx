@@ -1,4 +1,10 @@
+'use client';
+
+import { useLang } from '@/lib/i18n';
+
 export default function Loading() {
+  const { t } = useLang();
+
   return (
     <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-4 text-foreground sm:px-6">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -44,7 +50,7 @@ export default function Loading() {
         </div>
 
         <div className="font-mono text-[10px] uppercase tracking-[0.4em] text-muted/40">
-          <span className="text-accent-pink/50">$</span> загрузка
+          <span className="text-accent-pink/50">$</span> {t.loading.text}
           <span className="animate-pulse">_</span>
         </div>
       </div>

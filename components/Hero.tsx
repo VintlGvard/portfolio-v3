@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-
-const words = ['ПРОДУКТ', 'АРХИТЕКТУРУ', 'ПРОТОТИПЫ', 'РЕШЕНИЯ'] as const;
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { useLang } from '@/lib/i18n';
 
 export default function Hero() {
+  const { t } = useLang();
+  const words = t.hero.words;
   const [index, setIndex] = useState(0);
   const prefersReducedMotion = useReducedMotion();
 
@@ -17,10 +18,11 @@ export default function Hero() {
     }, 2000);
 
     return () => clearInterval(timer);
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, words.length]);
 
   const duration = prefersReducedMotion ? 0 : 0.6;
   const ease = [0.23, 1, 0.32, 1] as const;
+  const current = words[index % words.length] ?? '';
 
   return (
     <section
@@ -103,15 +105,12 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration, ease }}
           >
-            Смирнов Виталий | VintlGvard
+            {t.hero.name}
           </motion.h2>
 
-          <h1
-            className="max-w-full text-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:text-left sm:text-[clamp(3rem,12vw,10rem)]"
-            style={{ letterSpacing: '-0.04em' }}
-          >
+          <h1 className="max-w-full text-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:text-left sm:text-[clamp(3rem,12vw,10rem)]">
             <motion.span
-              className="inline-block mr-[0.3em]"
+              className="mr-[0.3em] inline-block"
               initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -120,18 +119,18 @@ export default function Hero() {
                 delay: prefersReducedMotion ? 0 : 0.08,
               }}
             >
-              Я
+              {t.hero.i}
             </motion.span>
-            <span className="text-muted not-italic">собираю</span>{' '}
+            <span className="text-muted not-italic">{t.hero.build}</span>{' '}
             <br />
             <span className="relative flex h-[1.3em] w-full max-w-full items-center justify-center overflow-hidden text-foreground not-italic">
               <span className="sr-only" aria-live="polite" aria-atomic="true">
-                {words[index]}
+                {current}
               </span>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
                   aria-hidden="true"
-                  key={words[index]}
+                  key={current}
                   initial={
                     prefersReducedMotion
                       ? { opacity: 1, y: 0, rotate: 0, filter: 'blur(0px)' }
@@ -152,19 +151,19 @@ export default function Hero() {
                   className="absolute left-1/2 -translate-x-1/2"
                 >
                   <span className="bg-gradient-to-r from-foreground via-foreground to-accent-pink bg-clip-text text-transparent">
-                    {words[index]}
+                    {current}
                   </span>
                 </motion.span>
               </AnimatePresence>
               <span className="opacity-0 tracking-tighter" aria-hidden="true">
-                АРХИТЕКТУРУ
+                {t.hero.spacer}
               </span>
             </span>
           </h1>
 
           <motion.p
             className="mt-4 min-w-0 self-center text-[clamp(2rem,14vw,10rem)] font-bold leading-[0.85] tracking-[-0.04em] uppercase sm:self-end sm:text-[clamp(3rem,12vw,10rem)]"
-            style={{ transform: 'skewX(-3deg)', letterSpacing: '-0.04em' }}
+            style={{ transform: 'skewX(-3deg)' }}
             initial={prefersReducedMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{
@@ -173,12 +172,12 @@ export default function Hero() {
               delay: prefersReducedMotion ? 0 : 0.16,
             }}
           >
-            С <span className="text-accent-pink">НУЛЯ</span>
+            {t.hero.from} <span className="text-accent-pink">{t.hero.scratch}</span>
           </motion.p>
         </div>
 
-          <motion.div
-            className="mt-20 max-w-xl min-w-0 overflow-hidden text-center sm:border-l-2 sm:border-accent-pink/30 sm:pl-8 sm:text-left"
+        <motion.div
+          className="mt-20 max-w-xl min-w-0 overflow-hidden text-center sm:border-l-2 sm:border-accent-pink/30 sm:pl-8 sm:text-left"
           style={{ transform: 'rotate(-0.3deg)' }}
           initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,23 +188,26 @@ export default function Hero() {
           }}
         >
           <p className="text-lg font-light leading-relaxed text-muted sm:text-xl">
-            Фуллстек разработчик полного цикла <br />
-            <span className="text-foreground font-medium">
-              От идеи до деплоя
+            {t.hero.subtitle1} <br />
+            <span className="font-medium text-foreground">
+              {t.hero.subtitle2}
             </span>
           </p>
-          <nav className="mt-6 flex items-center justify-center gap-4 sm:justify-start" aria-label="Навигация по секциям">
+          <nav
+            className="mt-6 flex items-center justify-center gap-4 sm:justify-start"
+            aria-label={t.hero.sectionsNavAria}
+          >
             <a
               href="#projects"
               className="inline-flex items-center gap-2 rounded-none border border-accent-pink/30 bg-accent-pink/10 px-5 py-2.5 text-sm font-medium text-accent-pink transition-colors hover:bg-accent-pink/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-pink"
             >
-              Проекты
+              {t.hero.projectsCta}
             </a>
             <a
               href="#contact"
               className="inline-flex items-center gap-2 rounded-none border border-foreground/20 px-5 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
             >
-              Связаться
+              {t.hero.contactCta}
             </a>
           </nav>
         </motion.div>

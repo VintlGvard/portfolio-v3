@@ -34,7 +34,6 @@ interface GlobalErrorShellProps {
   description: ReactNode;
   terminal: ReactNode;
   action: ReactNode;
-  timestamp: string;
   digest?: string;
 }
 
@@ -44,7 +43,6 @@ export default function GlobalErrorShell({
   description,
   terminal,
   action,
-  timestamp,
   digest,
 }: GlobalErrorShellProps) {
   return (
@@ -192,11 +190,6 @@ export default function GlobalErrorShell({
             {digest && (
               <p style={{ color: 'rgba(107,123,107,0.3)' }}>
                 digest: {digest}
-              </p>
-            )}
-            {timestamp && (
-              <p style={{ color: 'rgba(107,123,107,0.3)' }}>
-                timestamp: {timestamp}
               </p>
             )}
           </div>

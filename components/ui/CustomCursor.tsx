@@ -69,6 +69,7 @@ export default function CustomCursor() {
     document.documentElement.addEventListener('mouseleave', handleLeaveWindow);
 
     const attached = new WeakSet<EventTarget>();
+    let scanQueued = false;
 
     function attachToElement(el: Element) {
       if (attached.has(el)) return;
@@ -77,13 +78,20 @@ export default function CustomCursor() {
       el.addEventListener('mouseleave', handleHoverEnd);
     }
 
-    const observer = new MutationObserver(() => {
+    function scanDom() {
+      scanQueued = false;
       document.querySelectorAll(SELECTOR).forEach(attachToElement);
+    }
+
+    const observer = new MutationObserver(() => {
+      if (scanQueued) return;
+      scanQueued = true;
+      queueMicrotask(scanDom);
     });
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    document.querySelectorAll(SELECTOR).forEach(attachToElement);
+    scanDom();
 
     let rafId: number;
     const animate = () => {

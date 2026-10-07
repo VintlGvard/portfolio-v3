@@ -8,7 +8,7 @@
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-11-05F?logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Motion](https://img.shields.io/badge/Motion-14-05F?logo=framer&logoColor=white)](https://motion.dev)
 
 Личный сайт-портфолио на Next.js App Router с Brutalist / Swiss-дизайном, интерактивным облаком технологий и плавными анимациями.
 
@@ -22,7 +22,7 @@
 
 Этот сайт — не просто шаблон. Он демонстрирует мой подход к разработке: от архитектурных решений до визуальных деталей. Каждая секция — это осознанный выбор: монохромная палитра с акцентами, интерактивное облако технологий, кастомные анимации — всё работает на впечатление.
 
-Мой подход — **MVP-first + full-stack**. Начинаю с минимально жизнеспособного решения, затем итерирую: добавляю архитектуру, оптимизирую, довожу до продакшена. Проекты — от prototypes до production-ready приложений. Стек — TypeScript, Next.js, React, Tailwind CSS, Node.js. Интересуюсь R&D: экспериментирую с новыми фреймворками, паттернами и инструментами до того, как они станут мейнстримом.
+Мой подход — **MVP-first + full-stack**. Начинаю с минимально жизнеспособного решения, затем итерирую: добавляю архитектуру, оптимизирую, довожу до продакшена. Проекты — от prototypes до production-ready приложений. Стек — TypeScript, Next.js, React, Tailwind CSS, Node.js, Go. Интересуюсь R&D: экспериментирую с новыми фреймворками, паттернами и инструментами до того, как они станут мейнстримом.
 
 Сайт постоянно развивается — новые проекты и кейсы будут добавляться по мере их завершения.
 
@@ -58,11 +58,22 @@ Open [http://localhost:3000](http://localhost:3000) — главная стра�
 ### Available scripts
 
 ```bash
-npm run dev      # start development server
-npm run build    # production build
-npm start        # start production server
-npm run lint     # run ESLint
+npm run dev        # start development server
+npm run build      # production build
+npm start          # start production server
+npm run lint       # run ESLint
+npm run typecheck  # run tsc --noEmit
 ```
+
+## 🌍 i18n (EN default / RU)
+
+Client-side language switcher (`EN` default, persisted in `localStorage:portfolio-lang`):
+
+- `lib/i18n.tsx` — `LanguageProvider`, `useLang()`, EN/RU dictionaries
+- `components/LanguageSwitcher.tsx` — fixed `EN | RU` button (top-right)
+- `lib/projects.ts` — project data with `{ en, ru }` descriptions
+- All sections (`Hero`, `Skills`, `Projects`, `Info`, `Contact`, `Navbar`, `loading`) read strings from `useLang()`
+- Root metadata / OG image are EN by default (`og:locale en_US`, alternate `ru_RU`)
 
 ## 📂 Project Structure
 
@@ -80,12 +91,16 @@ portfolio-v3/
 │       ├── page.tsx            # главная: Hero → Skills → Projects → Info → Contact
 │       └── loading.tsx         # streaming loading skeleton
 ├── components/
-│   ├── Hero.tsx                # Hero-секция: анимированный заголовок с ротацией слов
-│   ├── Skills.tsx              # Icon Cloud технологий + категории стека
-│   ├── Projects.tsx            # Список проектов с hover-эффектами и ссылками
-│   ├── Info.tsx                # Блок «Обо мне»: MVP-подход, adaptive, R&D
-│   ├── Contact.tsx             # Контакты: email, Telegram, GitHub, GitLab
-│   ├── Navbar.tsx              # Фиксированная нижняя навигация (IntersectionObserver)
+│   ├── Hero.tsx                # Hero-секция: анимированный заголовок с ротацией слов (EN/RU)
+│   ├── Skills.tsx              # Icon Cloud технологий + категории стека (EN/RU)
+│   ├── Projects.tsx            # Список проектов из lib/projects.ts (EN/RU)
+│   ├── Info.tsx                # Блок «Обо мне»: MVP-подход, adaptive, R&D (EN/RU)
+│   ├── Contact.tsx             # Контакты: email, Telegram, GitHub, GitLab (EN/RU)
+│   ├── Navbar.tsx              # Фиксированная нижняя навигация (IntersectionObserver, EN/RU)
+│   ├── LanguageSwitcher.tsx    # Переключатель EN/RU (default EN, localStorage)
+├── lib/
+│   ├── i18n.tsx                # LanguageProvider + useLang + словари EN/RU
+│   ├── projects.ts             # Данные проектов: BreweryX, Steam PricePerHour, in-progress
 │   └── ui/
 │       ├── ArrowIcon.tsx       # SVG-стрелка для ссылок
 │       ├── ClientCursorWrapper.tsx  # клиентская обёртка для кастомного курсора
@@ -111,7 +126,7 @@ portfolio-v3/
 | **Language** | [TypeScript](https://www.typescriptlang.org) — strict mode |
 | **UI Library** | [React 19](https://react.dev) |
 | **Styling** | [Tailwind CSS 4](https://tailwindcss.com) — `@theme inline`, кастомные CSS-переменные |
-| **Animations** | [Framer Motion 11](https://www.framer.com/motion/) — `motion`, `AnimatePresence`, `useReducedMotion` в Hero, Navbar, Skills, Contact + CSS keyframes (`scan`, `float`, `drift`, `pulse-slow`) |
+| **Animations** | [Motion 14](https://motion.dev) (`motion/react` — `motion`, `AnimatePresence`, `useReducedMotion` в Hero, Navbar, Skills, Contact) + CSS keyframes (`scan`, `float`, `drift`, `pulse-slow`) |
 | **Icons** | [react-icon-cloud](https://github.com/VintlGvard/react-icon-cloud) — 3D-облако иконок из [SimpleIcons CDN](https://simpleicons.org) |
 | **Fonts** | [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk) (sans) + [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) (mono) через `next/font` |
 | **Linting** | [ESLint](https://eslint.org) + [Prettier](https://prettier.io) |
@@ -138,9 +153,7 @@ portfolio-v3/
 | **GitLab** | [gitlab.com/vintlgvard](https://gitlab.com/vintlgvard) |
 | **Email** | me@vintlgvard.com |
 
-## 🔗 Selected Project: BreweryX Recipe Generator
-
-Первый опубликованный кейс в портфолио — полнофункциональный инструмент без бэкенда.
+## 🔗 Selected Projects
 
 | | |
 |---|---|
@@ -149,7 +162,18 @@ portfolio-v3/
 | **Stack** | Next.js 16, TypeScript, Tailwind CSS 4, js-yaml |
 | **Approach** | Вся логика в браузере. Auto-save в localStorage, cookie-based theme, JSON-LD SEO. Решает конкретную задачу сообщества BreweryX. |
 
-> Это первый кейс — список проектов будет пополняться по мере завершения новых продуктов.
+| | |
+|---|---|
+| 🎮 **Steam PricePerHour** | Браузерное расширение: бейджи цены за час игры на страницах игр, в поиске, бандлах и на главной Steam. Поддержка всех официальных валют Steam. |
+| **Repo** | [github.com/VintlGvard/Steam_PricePerHour](https://github.com/VintlGvard/Steam_PricePerHour) |
+| **Store** | [Chrome Web Store](https://chromewebstore.google.com/detail/steam-priceperhour/pkpenhdpcdkmhelhlbbdddedipkmngco) · [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/steam-priceperhour/) |
+| **Stack** | JavaScript, CSS, WebExtensions (Chrome + Firefox) |
+
+| | |
+|---|---|
+| 🔧 **Case 03** | Следующий кейс — в работе. Следите за обновлениями на GitHub. |
+
+> Список проектов будет пополняться по мере завершения новых продуктов.
 
 ---
 

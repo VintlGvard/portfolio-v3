@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import GlobalErrorShell, {
   GLOBAL_ERROR_STYLES,
 } from '@/components/ui/GlobalErrorShell';
@@ -22,13 +21,8 @@ const LINK: React.CSSProperties = {
 };
 
 export default function GlobalNotFound() {
-  const [timestamp, setTimestamp] = useState('');
-  useEffect(() => {
-    setTimestamp(new Date().toISOString());
-  }, []);
-
   return (
-    <html lang="ru">
+    <html lang="en">
       <head>
         <style>{GLOBAL_ERROR_STYLES}</style>
       </head>
@@ -41,12 +35,16 @@ export default function GlobalNotFound() {
       >
         <GlobalErrorShell
           code="404"
-          title="Страница не найдена"
+          title="Page not found"
           description={
             <>
-              Запрашиваемый маршрут не существует или был перемещён.
+              The requested route does not exist or has been moved.
               <br />
-              Попробуйте вернуться на главную.
+              Try going back home.
+              <br />
+              <span style={{ color: 'rgba(107,123,107,0.6)' }}>
+                Маршрут не найден. Вернитесь на главную.
+              </span>
             </>
           }
           terminal={
@@ -64,11 +62,10 @@ export default function GlobalNotFound() {
               </p>
             </>
           }
-          timestamp={timestamp}
           action={
             <a href="/" style={LINK}>
               <span>←</span>
-              <span>На главную</span>
+              <span>Home · На главную</span>
             </a>
           }
         />

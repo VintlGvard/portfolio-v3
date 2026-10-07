@@ -2,19 +2,16 @@
 
 import Link from 'next/link';
 import ErrorCard from '@/components/ui/ErrorCard';
+import { useLang } from '@/lib/i18n';
 
 export default function NotFound() {
+  const { t } = useLang();
+
   return (
     <ErrorCard
       code="404"
-      title="Страница не найдена"
-      description={
-        <>
-          Запрашиваемый маршрут не существует или был перемещён.
-          <br />
-          Попробуйте вернуться на главную.
-        </>
-      }
+      title={t.error.notFoundTitle}
+      description={<>{t.error.notFoundDesc}</>}
       terminal={
         <>
           <p>
@@ -39,7 +36,7 @@ export default function NotFound() {
           <span className="transition-transform duration-300 group-hover:-translate-x-1">
             ←
           </span>
-          <span>На главную</span>
+          <span>{t.error.notFoundAction}</span>
         </Link>
       }
     />

@@ -1,10 +1,11 @@
 'use client';
 
 import { memo, useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion, type Variants } from 'motion/react';
 import { Cloud, fetchSimpleIcons, type ICloud } from 'react-icon-cloud';
 import SectionContainer from '@/components/ui/SectionContainer';
 import SectionHeader from '@/components/ui/SectionHeader';
+import { useLang } from '@/lib/i18n';
 
 interface SimpleIcon {
   slug: string;
@@ -26,6 +27,7 @@ const SLUGS = [
   'django',
   'flask',
   'fastapi',
+  'go',
   'postgresql',
   'mysql',
   'mongodb',
@@ -60,6 +62,7 @@ const SLUG_TITLES: Record<string, string> = {
   django: 'Django',
   flask: 'Flask',
   fastapi: 'FastAPI',
+  go: 'Go',
   postgresql: 'PostgreSQL',
   mysql: 'MySQL',
   mongodb: 'MongoDB',
@@ -118,11 +121,22 @@ function writeCache(data: IconData) {
 }
 
 async function fetchWithTimeout(ms = 8000): Promise<IconData> {
-  const timeout = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error('simple-icons timeout')), ms),
-  );
-  const res = await Promise.race([fetchSimpleIcons({ slugs: SLUGS }), timeout]);
-  return res as IconData;
+  let timer = 0;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = window.setTimeout(
+      () => reject(new Error('simple-icons timeout')),
+      ms,
+    );
+  });
+  try {
+    const res = await Promise.race([
+      fetchSimpleIcons({ slugs: SLUGS }),
+      timeout,
+    ]);
+    return res as IconData;
+  } finally {
+    window.clearTimeout(timer);
+  }
 }
 
 const ICON_COLORS = [
@@ -200,10 +214,11 @@ const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
 });
 
 const SkillFallbackGrid = memo(function SkillFallbackGrid() {
+  const { t } = useLang();
   return (
     <ul
       className="grid max-w-full grid-cols-3 gap-2 p-6 sm:grid-cols-4 sm:gap-3 sm:p-8"
-      aria-label="Технологический стек списком"
+      aria-label={t.skills.listAria}
     >
       {SLUGS.map((slug) => (
         <li
@@ -217,54 +232,47 @@ const SkillFallbackGrid = memo(function SkillFallbackGrid() {
   );
 });
 
-const TECH_CATEGORIES = [
+const TECH_CATEGORIES_META = [
   {
-    label: 'Frontend',
-    tech: 'Next.js, React, TypeScript, Tailwind',
     color: 'bg-accent-pink',
     textColor: 'text-accent-pink',
   },
   {
-    label: 'Backend',
-    tech: 'Node.js, PHP, Python, Django',
     color: 'bg-accent-olive',
     textColor: 'text-accent-olive',
   },
   {
-    label: 'Data',
-    tech: 'PostgreSQL, MongoDB, Supabase',
     color: 'bg-accent-pink/70',
     textColor: 'text-accent-pink/70',
   },
   {
-    label: 'DevOps',
-    tech: 'Docker, GitLab CI, Nginx',
     color: 'bg-accent-olive/70',
     textColor: 'text-accent-olive/70',
   },
 ] as const;
 
 export default function Skills() {
+  const { t } = useLang();
   const [data, setData] = useState<IconData | null>(null);
   const [failed, setFailed] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  const fadeUp = {
+  const fadeUp: Variants = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 28 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
   };
 
-  const stagger = {
+  const stagger: Variants = {
     visible: { transition: { staggerChildren: 0.1 } },
   };
 
   useEffect(() => {
     let cancelled = false;
 
-    const cached = readCache();
-    if (cached) setData(cached);
+    const load = async () => {
+      const cached = readCache();
+      if (!cancelled && cached) setData(cached);
 
-    (async () => {
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           const fresh = await fetchWithTimeout(8000);
@@ -283,7 +291,9 @@ export default function Skills() {
           }
         }
       }
-    })();
+    };
+
+    void load();
 
     return () => {
       cancelled = true;
@@ -298,7 +308,7 @@ export default function Skills() {
       className="relative flex items-center overflow-hidden font-sans"
     >
       <div className="relative z-10 mx-auto w-full max-w-5xl">
-        <SectionHeader index="01" label="Технологический стек" />
+        <SectionHeader index="01" label={t.skills.header} />
 
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
           <motion.div
@@ -331,7 +341,7 @@ export default function Skills() {
                 <StaticCloud data={data} />
               ) : (
                 <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/30">
-                  Загрузка_модулей...
+                  {t.skills.loading}
                 </div>
               )}
             </div>
@@ -339,10 +349,10 @@ export default function Skills() {
             <div className="pointer-events-none absolute bottom-4 right-4 z-30 hidden font-mono text-right sm:block" aria-hidden="true">
               <div className="flex flex-col items-end gap-1">
                 <p className="text-[9px] uppercase tracking-widest text-accent-pink/50">
-                  System_Status
+                  {t.skills.statusLabel}
                 </p>
                 <p className="border border-accent-pink/20 bg-accent-pink/5 px-3 py-1.5 text-[11px] uppercase tracking-tighter text-foreground">
-                  Выбираю стек для нового проекта
+                  {t.skills.statusText}
                   <span className="animate-pulse">...</span>
                 </p>
               </div>
@@ -363,39 +373,35 @@ export default function Skills() {
           >
             <div className="space-y-8">
               <motion.div variants={fadeUp}>
-                <h2
-                  className="text-3xl font-bold leading-tight tracking-[-0.02em] uppercase sm:text-4xl"
-                  style={{ letterSpacing: '-0.02em' }}
-                >
-                  Архитектура <br />
+                <h2 className="text-3xl font-bold leading-tight tracking-[-0.02em] uppercase sm:text-4xl">
+                  {t.skills.titleA} <br />
                   <span
                     className="font-mono font-light italic text-accent-pink"
                     style={{ letterSpacing: '0.05em' }}
                   >
-                    решений
+                    {t.skills.titleB}
                   </span>
                 </h2>
                 <p className="mt-5 max-w-md text-base font-light leading-relaxed text-muted sm:text-lg">
-                  Мой стек — это не просто список инструментов, а выверенная
-                  экосистема для быстрого запуска продуктов
+                  {t.skills.desc}
                 </p>
               </motion.div>
 
               <div className="space-y-5 font-mono">
-                {TECH_CATEGORIES.map((item) => (
+                {t.skills.categories.map((item, i) => (
                   <motion.div
                     key={item.label}
                     variants={fadeUp}
                     className="group flex items-start gap-3 transition-all duration-300 hover:translate-x-1"
                   >
                     <div
-                      className={`mt-1.5 h-2 w-2 ${item.color} transition-transform duration-300 group-hover:scale-150 group-hover:rotate-45`}
+                      className={`mt-1.5 h-2 w-2 ${TECH_CATEGORIES_META[i % TECH_CATEGORIES_META.length].color} transition-transform duration-300 group-hover:scale-150 group-hover:rotate-45`}
                       style={{ borderRadius: '0' }}
                       aria-hidden="true"
                     />
                     <div>
                       <p
-                        className={`mb-0.5 text-[10px] uppercase tracking-[0.3em] ${item.textColor}/60`}
+                        className={`mb-0.5 text-[10px] uppercase tracking-[0.3em] ${TECH_CATEGORIES_META[i % TECH_CATEGORIES_META.length].textColor}/60`}
                       >
                         {item.label}
                       </p>
@@ -414,14 +420,14 @@ export default function Skills() {
               style={{ borderRadius: '0' }}
             >
               <div className="flex justify-between text-accent-pink/70">
-                <span>Подбор решения для нового проекта</span>
-                <span className="text-foreground">Оптимально</span>
+                <span>{t.skills.fitLabel}</span>
+                <span className="text-foreground">{t.skills.fitValue}</span>
               </div>
               <div className="relative h-[2px] w-full overflow-hidden bg-foreground/10">
                 <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-accent-pink via-accent-olive to-accent-pink shadow-[0_0_10px_rgba(255,45,111,0.2)] animate-pulse" />
               </div>
               <p className="text-[9px] leading-tight tracking-tighter text-muted/50 normal-case italic">
-                Адаптированный стек под сверхбыстрый MVP подход
+                {t.skills.fitNote}
               </p>
             </motion.div>
           </motion.div>

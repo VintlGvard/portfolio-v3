@@ -2,20 +2,12 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-
-const NAV_ITEMS = [
-  { label: 'Старт', href: '#hero' },
-  { label: 'Скиллы', href: '#skills' },
-  { label: 'Проекты', href: '#projects' },
-  { label: 'Инфо', href: '#info' },
-  { label: 'Связь', href: '#contact' },
-] as const;
-
-type NavHref = (typeof NAV_ITEMS)[number]['href'];
+import { motion, useReducedMotion } from 'motion/react';
+import { useLang } from '@/lib/i18n';
 
 export default function Navbar() {
-  const [activeSection, setActiveSection] = useState<NavHref | null>(null);
+  const { t } = useLang();
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -24,11 +16,11 @@ export default function Navbar() {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const id = entry.target.id;
-            if (id) setActiveSection(`#${id}` as NavHref);
+            if (id) setActiveSection(`#${id}`);
           }
         });
       },
-      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
     );
 
     const observed = new WeakSet<Element>();
@@ -61,13 +53,13 @@ export default function Navbar() {
   return (
     <div className="pointer-events-none fixed bottom-4 left-0 z-[100] flex w-full justify-center px-2 font-sans sm:bottom-10 sm:px-4">
       <nav
-        aria-label="Основная навигация"
+        aria-label={t.navAria}
         className="pointer-events-auto relative flex items-center gap-0 border-2 border-foreground/10 bg-background/80 p-1 backdrop-blur-xl transition-all duration-500 hover:border-foreground/20 sm:gap-0 sm:p-1"
         style={{ borderRadius: '0' }}
       >
         <div className="absolute inset-x-0 -top-[2px] h-[2px] bg-gradient-to-r from-transparent via-accent-pink/40 to-transparent" />
 
-        {NAV_ITEMS.map((item) => {
+        {t.nav.map((item) => {
           const isActive =
             activeSection === item.href ||
             (activeSection === null && item.href === '#hero');
@@ -90,7 +82,7 @@ export default function Navbar() {
               {isActive && (
                 <motion.div
                   layoutId="nav-active-indicator"
-                  className="absolute inset-0 z-0 bg-foreground/[0.06] border-b-2 border-accent-pink"
+                  className="absolute inset-0 z-0 border-b-2 border-accent-pink bg-foreground/[0.06]"
                   transition={
                     prefersReducedMotion
                       ? { duration: 0 }

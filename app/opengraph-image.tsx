@@ -34,7 +34,7 @@ export default function OpengraphImage() {
           Full-Stack
         </div>
         <div style={{ fontSize: 84, fontWeight: 800, lineHeight: 1 }}>
-          разработчик
+          Developer
         </div>
         <div
           style={{
@@ -43,7 +43,7 @@ export default function OpengraphImage() {
             color: '#6b7b6b',
           }}
         >
-          MVP · Прототипы · Продакшен на Next.js / React / Node.js / Python
+          MVP · Prototypes · Production with Next.js / React / Node.js / Go / Python
         </div>
       </div>
     ),

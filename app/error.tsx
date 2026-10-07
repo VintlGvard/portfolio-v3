@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import ErrorCard from '@/components/ui/ErrorCard';
+import { useLang } from '@/lib/i18n';
 
 export default function Error({
   error,
@@ -10,6 +11,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useLang();
+
   useEffect(() => {
     console.error('[App Error]', error);
   }, [error]);
@@ -17,14 +20,8 @@ export default function Error({
   return (
     <ErrorCard
       code="500"
-      title="Что-то пошло не так"
-      description={
-        <>
-          Произошла непредвиденная ошибка на сервере.
-          <br />
-          Попробуйте обновить страницу.
-        </>
-      }
+      title={t.error.crashTitle}
+      description={<>{t.error.crashDesc}</>}
       terminal={
         <p>
           <span className="text-accent-pink/60">!</span> RuntimeError: Internal
@@ -41,7 +38,7 @@ export default function Error({
           <span className="transition-transform duration-300 group-hover:rotate-180">
             ↻
           </span>
-          <span>Попробовать снова</span>
+          <span>{t.error.crashAction}</span>
         </button>
       }
     />
