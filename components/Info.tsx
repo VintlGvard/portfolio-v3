@@ -8,18 +8,22 @@ import { useLang } from '@/lib/i18n';
 const COLORS = [
   {
     color: 'text-accent-pink',
+    indexColor: 'text-accent-pink/40',
     borderColor: 'group-hover:border-accent-pink/40',
   },
   {
     color: 'text-accent-olive',
+    indexColor: 'text-accent-olive/40',
     borderColor: 'group-hover:border-accent-olive/40',
   },
   {
     color: 'text-accent-pink/70',
+    indexColor: 'text-accent-pink/40',
     borderColor: 'group-hover:border-accent-pink/30',
   },
   {
     color: 'text-accent-olive/70',
+    indexColor: 'text-accent-olive/40',
     borderColor: 'group-hover:border-accent-olive/30',
   },
 ] as const;
@@ -65,7 +69,7 @@ export default function Info() {
               >
                 <h3 className="mb-2 flex items-center gap-2 font-medium">
                   <span
-                    className={`font-mono text-[10px] ${COLORS[index % COLORS.length].color}/40`}
+                    className={`font-mono text-[10px] ${COLORS[index % COLORS.length].indexColor}`}
                   >
                     [{index + 1}]
                   </span>

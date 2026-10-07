@@ -18,7 +18,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["components/Skills.tsx"],
+    files: ["components/TechCloud.tsx"],
     rules: {
       "@next/next/no-img-element": "off",
     },

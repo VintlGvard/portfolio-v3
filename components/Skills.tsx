@@ -1,264 +1,46 @@
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, useReducedMotion, type Variants } from 'motion/react';
-import { Cloud, fetchSimpleIcons, type ICloud } from 'react-icon-cloud';
 import SectionContainer from '@/components/ui/SectionContainer';
 import SectionHeader from '@/components/ui/SectionHeader';
+import SkillFallbackGrid from '@/components/SkillFallbackGrid';
+import { TechCloudErrorBoundary } from '@/components/TechCloudErrorBoundary';
 import { useLang } from '@/lib/i18n';
 
-interface SimpleIcon {
-  slug: string;
-  title: string;
-}
-
-interface IconData {
-  simpleIcons: Record<string, SimpleIcon>;
-}
-
-const SLUGS = [
-  'javascript',
-  'typescript',
-  'python',
-  'php',
-  'nextdotjs',
-  'react',
-  'nodedotjs',
-  'django',
-  'flask',
-  'fastapi',
-  'go',
-  'postgresql',
-  'mysql',
-  'mongodb',
-  'supabase',
-  'docker',
-  'gitlab',
-  'nginx',
-  'tailwindcss',
-  'bootstrap',
-  'sass',
-  'vite',
-  'webpack',
-  'jest',
-  'intellijidea',
-  'pycharm',
-  'webstorm',
-  'postman',
-  'sublimetext',
-  'figma',
-  'notion',
-  'unity',
-];
-
-const SLUG_TITLES: Record<string, string> = {
-  javascript: 'JavaScript',
-  typescript: 'TypeScript',
-  python: 'Python',
-  php: 'PHP',
-  nextdotjs: 'Next.js',
-  react: 'React',
-  nodedotjs: 'Node.js',
-  django: 'Django',
-  flask: 'Flask',
-  fastapi: 'FastAPI',
-  go: 'Go',
-  postgresql: 'PostgreSQL',
-  mysql: 'MySQL',
-  mongodb: 'MongoDB',
-  supabase: 'Supabase',
-  docker: 'Docker',
-  gitlab: 'GitLab',
-  nginx: 'Nginx',
-  tailwindcss: 'Tailwind CSS',
-  bootstrap: 'Bootstrap',
-  sass: 'Sass',
-  vite: 'Vite',
-  webpack: 'Webpack',
-  jest: 'Jest',
-  intellijidea: 'IntelliJ IDEA',
-  pycharm: 'PyCharm',
-  webstorm: 'WebStorm',
-  postman: 'Postman',
-  sublimetext: 'Sublime Text',
-  figma: 'Figma',
-  notion: 'Notion',
-  unity: 'Unity',
-};
-
-const CACHE_KEY = 'skills-simple-icons-v1';
-const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-function buildFallbackData(): IconData {
-  const simpleIcons: Record<string, SimpleIcon> = {};
-  for (const slug of SLUGS) {
-    simpleIcons[slug] = { slug, title: SLUG_TITLES[slug] ?? slug };
-  }
-  return { simpleIcons };
-}
-
-function readCache(): IconData | null {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { ts: number; data: IconData };
-    if (!parsed?.data?.simpleIcons || Date.now() - parsed.ts > CACHE_TTL_MS) {
-      localStorage.removeItem(CACHE_KEY);
-      return null;
-    }
-    return parsed.data;
-  } catch {
-    return null;
-  }
-}
-
-function writeCache(data: IconData) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
-  } catch {
-    void 0;
-  }
-}
-
-async function fetchWithTimeout(ms = 8000): Promise<IconData> {
-  let timer = 0;
-  const timeout = new Promise<never>((_, reject) => {
-    timer = window.setTimeout(
-      () => reject(new Error('simple-icons timeout')),
-      ms,
-    );
-  });
-  try {
-    const res = await Promise.race([
-      fetchSimpleIcons({ slugs: SLUGS }),
-      timeout,
-    ]);
-    return res as IconData;
-  } finally {
-    window.clearTimeout(timer);
-  }
-}
-
-const ICON_COLORS = [
-  'ff2d6f',
-  'ff6b9d',
-  'e8457a',
-  '4a8c5c',
-  '6ba38a',
-  'ff8ab5',
-  '2d4a2d',
-];
-
-function getIconColor(slug: string): string {
-  let hash = 0;
-  for (let i = 0; i < slug.length; i++) {
-    hash = slug.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return ICON_COLORS[Math.abs(hash) % ICON_COLORS.length];
-}
-
-const StaticCloud = memo(function StaticCloud({ data }: { data: IconData }) {
-  const cloudProps: Omit<ICloud, 'children'> = {
-    containerProps: {
-      className: 'flex items-center justify-center w-full h-full',
-    },
-    canvasProps: {
-      style: {
-        width: '100%',
-        maxWidth: '100%',
-      },
-    },
-    options: {
-      reverse: true,
-      depth: 0.8,
-      wheelZoom: false,
-      imageScale: 2.4,
-      activeCursor: 'default',
-      initial: [0.1, -0.1],
-      outlineColour: '#0000',
-      maxSpeed: 0.02,
-      minSpeed: 0.01,
-      dragControl: true,
-      dragThreshold: 4,
-      pinchZoom: true,
-      freezeActive: true,
-      shuffleTags: true,
-    },
-  };
-
-  const icons = Object.values(data.simpleIcons).map((icon) => (
-    <a
-      key={icon.slug}
-      href={`https://simpleicons.org/?q=${icon.slug}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={icon.title}
-    >
-      <img
-        height={52}
-        width={52}
-        src={`https://cdn.simpleicons.org/${icon.slug}/${getIconColor(icon.slug)}`}
-        alt={icon.title}
-        loading="lazy"
-        decoding="async"
-        draggable={false}
-        referrerPolicy="no-referrer"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-        }}
-      />
-    </a>
-  ));
-
-  return <Cloud {...cloudProps}>{icons}</Cloud>;
-});
-
-const SkillFallbackGrid = memo(function SkillFallbackGrid() {
-  const { t } = useLang();
-  return (
-    <ul
-      className="grid max-w-full grid-cols-3 gap-2 p-6 sm:grid-cols-4 sm:gap-3 sm:p-8"
-      aria-label={t.skills.listAria}
-    >
-      {SLUGS.map((slug) => (
-        <li
-          key={slug}
-          className="border border-foreground/10 bg-foreground/[0.02] px-2 py-2 text-center font-mono text-[10px] uppercase tracking-[0.15em] text-foreground/70 transition-colors hover:border-accent-pink/40 hover:text-foreground sm:text-[11px]"
-        >
-          {SLUG_TITLES[slug] ?? slug}
-        </li>
-      ))}
-    </ul>
-  );
+const TechCloud = dynamic(() => import('@/components/TechCloud'), {
+  ssr: false,
+  loading: () => <SkillFallbackGrid />,
 });
 
 const TECH_CATEGORIES_META = [
   {
     color: 'bg-accent-pink',
-    textColor: 'text-accent-pink',
+    labelColor: 'text-accent-pink/60',
   },
   {
     color: 'bg-accent-olive',
-    textColor: 'text-accent-olive',
+    labelColor: 'text-accent-olive/60',
   },
   {
     color: 'bg-accent-pink/70',
-    textColor: 'text-accent-pink/70',
+    labelColor: 'text-accent-pink/60',
   },
   {
     color: 'bg-accent-olive/70',
-    textColor: 'text-accent-olive/70',
+    labelColor: 'text-accent-olive/60',
   },
 ] as const;
 
 export default function Skills() {
   const { t } = useLang();
-  const [data, setData] = useState<IconData | null>(null);
-  const [failed, setFailed] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const [loadCloud, setLoadCloud] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const fadeUp: Variants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 28 },
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 28 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
   };
 
@@ -267,40 +49,24 @@ export default function Skills() {
   };
 
   useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      const cached = readCache();
-      if (!cancelled && cached) setData(cached);
-
-      for (let attempt = 0; attempt < 2; attempt++) {
-        try {
-          const fresh = await fetchWithTimeout(8000);
-          if (!cancelled && fresh?.simpleIcons) {
-            setData(fresh);
-            setFailed(false);
-            writeCache(fresh);
-            return;
-          }
-        } catch {
-          if (attempt === 1 && !cancelled) {
-            if (!readCache()) {
-              setData(buildFallbackData());
-            }
-            setFailed(true);
-          }
+    if (prefersReducedMotion || typeof IntersectionObserver === 'undefined')
+      return;
+    const el = boxRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setLoadCloud(true);
+          io.disconnect();
         }
-      }
-    };
+      },
+      { rootMargin: '300px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [prefersReducedMotion]);
 
-    void load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const showStaticGrid = shouldReduceMotion || failed;
+  const showStaticGrid = prefersReducedMotion || !loadCloud;
 
   return (
     <SectionContainer
@@ -312,6 +78,7 @@ export default function Skills() {
 
         <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
           <motion.div
+            ref={boxRef}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
@@ -337,12 +104,10 @@ export default function Skills() {
             <div className="relative z-0 flex h-full w-full items-center justify-center">
               {showStaticGrid ? (
                 <SkillFallbackGrid />
-              ) : data ? (
-                <StaticCloud data={data} />
               ) : (
-                <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-[0.4em] text-muted/30">
-                  {t.skills.loading}
-                </div>
+                <TechCloudErrorBoundary>
+                  <TechCloud />
+                </TechCloudErrorBoundary>
               )}
             </div>
 
@@ -401,7 +166,7 @@ export default function Skills() {
                     />
                     <div>
                       <p
-                        className={`mb-0.5 text-[10px] uppercase tracking-[0.3em] ${TECH_CATEGORIES_META[i % TECH_CATEGORIES_META.length].textColor}/60`}
+                        className={`mb-0.5 text-[10px] uppercase tracking-[0.3em] ${TECH_CATEGORIES_META[i % TECH_CATEGORIES_META.length].labelColor}`}
                       >
                         {item.label}
                       </p>

@@ -53,7 +53,7 @@ async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export default function ContactPage() {
+export default function Contact() {
   const { t } = useLang();
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);

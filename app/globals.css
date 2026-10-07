@@ -84,20 +84,22 @@ body {
   outline: none;
 }
 
-a,
-button,
-input,
-textarea,
-select,
-[tabindex] {
-  color: inherit;
-}
+@layer base {
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [tabindex] {
+    color: inherit;
+  }
 
-button,
-input,
-textarea,
-select {
-  font: inherit;
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 }
 
 img,

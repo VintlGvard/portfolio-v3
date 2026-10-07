@@ -37,7 +37,6 @@ interface Dictionary {
     titleA: string;
     titleB: string;
     desc: string;
-    loading: string;
     listAria: string;
     statusLabel: string;
     statusText: string;
@@ -119,7 +118,6 @@ const en: Dictionary = {
     titleA: 'Solution',
     titleB: 'architecture',
     desc: 'My stack is not just a list of tools — it is a tuned ecosystem for shipping products fast',
-    loading: 'Loading_modules...',
     listAria: 'Tech stack as a list',
     statusLabel: 'System_Status',
     statusText: 'Picking stack for a new project',
@@ -225,7 +223,6 @@ const ru: Dictionary = {
     titleA: 'Архитектура',
     titleB: 'решений',
     desc: 'Мой стек — это не просто список инструментов, а выверенная экосистема для быстрого запуска продуктов',
-    loading: 'Загрузка_модулей...',
     listAria: 'Технологический стек списком',
     statusLabel: 'System_Status',
     statusText: 'Выбираю стек для нового проекта',

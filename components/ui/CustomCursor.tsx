@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 const SELECTOR =
   'a, button, [role="button"], input, textarea, select, [data-cursor-hover]';
+const SETTLE_PX = 0.05;
+const OFFSCREEN = { x: -100, y: -100 };
 
 function getMatcher() {
   return window.matchMedia(
@@ -13,12 +15,8 @@ function getMatcher() {
 
 function subscribe(cb: () => void) {
   const mql = getMatcher();
-  if (typeof mql.addEventListener === 'function') {
-    mql.addEventListener('change', cb);
-    return () => mql.removeEventListener('change', cb);
-  }
-  mql.addListener(cb);
-  return () => mql.removeListener(cb);
+  mql.addEventListener('change', cb);
+  return () => mql.removeEventListener('change', cb);
 }
 
 function getSnapshot() {
@@ -34,8 +32,11 @@ export default function CustomCursor() {
   const trailRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
-  const pos = useRef({ x: -100, y: -100 });
-  const trailPos = useRef({ x: -100, y: -100 });
+  const pos = useRef({ ...OFFSCREEN });
+  const trailPos = useRef({ ...OFFSCREEN });
+  const rafId = useRef(0);
+  const hovering = useRef(false);
+  const started = useRef(false);
 
   const isTouchDevice = useSyncExternalStore(
     subscribe,
@@ -48,81 +49,99 @@ export default function CustomCursor() {
 
     document.body.classList.add('custom-cursor-active');
 
-    const handleMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY };
+    const stopLoop = () => {
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+        rafId.current = 0;
+      }
     };
 
-    const handleMouseDown = () => setIsClicking(true);
-    const handleMouseUp = () => setIsClicking(false);
-
-    const handleHoverStart = () => setIsHovering(true);
-    const handleHoverEnd = () => setIsHovering(false);
-
-    const handleLeaveWindow = () => {
-      pos.current = { x: -100, y: -100 };
-      setIsHovering(false);
-    };
-
-    window.addEventListener('mousemove', handleMove, { passive: true });
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    document.documentElement.addEventListener('mouseleave', handleLeaveWindow);
-
-    const attached = new WeakSet<EventTarget>();
-    let scanQueued = false;
-
-    function attachToElement(el: Element) {
-      if (attached.has(el)) return;
-      attached.add(el);
-      el.addEventListener('mouseenter', handleHoverStart);
-      el.addEventListener('mouseleave', handleHoverEnd);
-    }
-
-    function scanDom() {
-      scanQueued = false;
-      document.querySelectorAll(SELECTOR).forEach(attachToElement);
-    }
-
-    const observer = new MutationObserver(() => {
-      if (scanQueued) return;
-      scanQueued = true;
-      queueMicrotask(scanDom);
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    scanDom();
-
-    let rafId: number;
-    const animate = () => {
-      trailPos.current.x += (pos.current.x - trailPos.current.x) * 0.15;
-      trailPos.current.y += (pos.current.y - trailPos.current.y) * 0.15;
-
+    const writePositions = () => {
       if (cursorRef.current) {
         cursorRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`;
       }
       if (trailRef.current) {
         trailRef.current.style.transform = `translate(${trailPos.current.x}px, ${trailPos.current.y}px) translate(-50%, -50%)`;
       }
-      rafId = requestAnimationFrame(animate);
     };
-    rafId = requestAnimationFrame(animate);
+
+    const animate = () => {
+      trailPos.current.x += (pos.current.x - trailPos.current.x) * 0.15;
+      trailPos.current.y += (pos.current.y - trailPos.current.y) * 0.15;
+
+      const dx = pos.current.x - trailPos.current.x;
+      const dy = pos.current.y - trailPos.current.y;
+
+      if (Math.abs(dx) < SETTLE_PX && Math.abs(dy) < SETTLE_PX) {
+        trailPos.current.x = pos.current.x;
+        trailPos.current.y = pos.current.y;
+        writePositions();
+        rafId.current = 0;
+        return;
+      }
+
+      writePositions();
+      rafId.current = requestAnimationFrame(animate);
+    };
+
+    const startLoop = () => {
+      if (rafId.current) return;
+      rafId.current = requestAnimationFrame(animate);
+    };
+
+    const handleMove = (e: MouseEvent) => {
+      pos.current = { x: e.clientX, y: e.clientY };
+      if (!started.current) {
+        started.current = true;
+        trailPos.current = { x: e.clientX, y: e.clientY };
+      }
+      startLoop();
+    };
+
+    const handleMouseDown = () => setIsClicking(true);
+    const handleMouseUp = () => setIsClicking(false);
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target;
+      const match =
+        target instanceof Element && !!target.closest(SELECTOR);
+      if (match !== hovering.current) {
+        hovering.current = match;
+        setIsHovering(match);
+      }
+    };
+
+    const handleLeaveWindow = () => {
+      stopLoop();
+      pos.current = { ...OFFSCREEN };
+      trailPos.current = { ...OFFSCREEN };
+      writePositions();
+      if (hovering.current) {
+        hovering.current = false;
+        setIsHovering(false);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMove, { passive: true });
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseover', handleMouseOver);
+    document.documentElement.addEventListener(
+      'mouseleave',
+      handleLeaveWindow,
+    );
 
     return () => {
+      stopLoop();
       document.body.classList.remove('custom-cursor-active');
       window.removeEventListener('mousemove', handleMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseover', handleMouseOver);
       document.documentElement.removeEventListener(
         'mouseleave',
         handleLeaveWindow,
       );
-      cancelAnimationFrame(rafId);
-      observer.disconnect();
-      document.querySelectorAll(SELECTOR).forEach((el) => {
-        el.removeEventListener('mouseenter', handleHoverStart);
-        el.removeEventListener('mouseleave', handleHoverEnd);
-      });
     };
   }, [isTouchDevice]);
 
